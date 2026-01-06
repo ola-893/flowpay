@@ -1,17 +1,28 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { ethers, Contract, Wallet, JsonRpcProvider } from 'ethers';
+import { GeminiPaymentBrain } from './GeminiPaymentBrain';
 
 export interface FlowPayConfig {
     privateKey: string;
     rpcUrl: string;
+    apiKey?: string;
+}
+
+export interface StreamMetadata {
+    streamId: string;
+    startTime: number;
+    rate: bigint;
+    amount: bigint;
 }
 
 export class FlowPaySDK {
     private wallet: Wallet;
     private provider: JsonRpcProvider;
-    // Cache active stream IDs by Recipient Address -> Stream ID
-    // specific to our current simple use case where we assume one stream per recipient is enough
-    private activeStreams: Map<string, string> = new Map();
+    private apiKey?: string;
+
+    // Cache active streams by Host -> Metadata
+    private activeStreams: Map<string, StreamMetadata> = new Map();
+    public brain: GeminiPaymentBrain;
 
     private MIN_ABI = [
         "function createStream(address recipient, uint256 duration, uint256 amount, string metadata) external",
@@ -22,48 +33,139 @@ export class FlowPaySDK {
 
     private ERC20_ABI = [
         "function approve(address spender, uint256 amount) external returns (bool)",
+        "function transfer(address recipient, uint256 amount) external returns (bool)",
         "function allowance(address owner, address spender) external view returns (uint256)"
     ];
 
     constructor(config: FlowPayConfig) {
         this.provider = new JsonRpcProvider(config.rpcUrl);
         this.wallet = new Wallet(config.privateKey, this.provider);
+        this.apiKey = config.apiKey;
+        // Initialize Gemini Brain (requires separate key? reusing apiKey for simplify, but in reality likely different)
+        // For Hackathon, let's assume config.apiKey is the FlowPay key, but we might pass a separate 'geminiKey' in config?
+        // Let's assume config might have `geminiKey` added to interface or we use env var?
+        // Let's modify interface locally or just pass undefined to safe-fail.
+        this.brain = new GeminiPaymentBrain(process.env.GEMINI_API_KEY); // Assuming env var for Security
+    }
+
+    // Metric counters
+    private metrics = {
+        requestsSent: 0,
+        signersTriggered: 0
+    };
+
+    /**
+     * Get efficiency metrics
+     */
+    public getMetrics() {
+        return this.metrics;
+    }
+
+
+
+    /**
+     * AI/Hybrid Payment Brain
+     * Decides whether to use 'direct' (per-request) or 'stream' (streaming) mode
+     * based on estimated request volume and gas costs.
+     */
+    public async selectPaymentMode(estimatedRequests: number): Promise<'direct' | 'stream'> {
+        const decision = await this.brain.shouldStream(estimatedRequests);
+        console.log(`[FlowPaySDK] 🤖 Gemini Analysis: ${decision.reasoning}`);
+        return decision.mode;
+    }
+
+    public async askAgent(query: string): Promise<string> {
+        return this.brain.ask(query, {
+            activeStreams: this.activeStreams.size,
+            metrics: this.metrics
+        });
     }
 
     /**
      * Makes an HTTP request with automatic x402 handling
      */
     public async makeRequest(url: string, options: AxiosRequestConfig = {}): Promise<AxiosResponse> {
+        this.metrics.requestsSent++;
+
+        // Host extraction for simple caching key
+        const host = new URL(url).host;
+        // In real world, we'd cache by recipient, but we don't know recipient until 402.
+        // So we cache by "host/path-prefix" or just host for now as specific to our 402 server.
+        const cachedStream = this.activeStreams.get(host);
+
         try {
-            // 1. Attempt request normally (or inject existing stream if we have one for this host?)
-            // For now, try blindly or use cached stream if we implemented host-based caching.
-            // Let's implement simple retry logic first.
-            return await axios(url, options);
+            // Inject API Key if present
+            const headers = { ...options.headers };
+            if (this.apiKey) {
+                (headers as any)['x-api-key'] = this.apiKey;
+            }
+
+            // Inject Cached Stream ID if available and valid
+            if (cachedStream) {
+                // Check remaining balance
+                const remaining = this.calculateRemaining(cachedStream);
+                // Simple threshold: if less than ~5 seconds worth of streaming left, consider it empty/risk.
+                // Or just if > 0.
+                if (remaining <= 0n) {
+                    console.log("[FlowPaySDK] Cached stream depleted. Clearing cache...");
+                    this.activeStreams.delete(host);
+                } else {
+                    (headers as any)['X-FlowPay-Stream-ID'] = cachedStream.streamId;
+                }
+            }
+
+            const enhancedOptions = { ...options, headers };
+
+            // 1. Attempt request
+            return await axios(url, enhancedOptions);
         } catch (error: any) {
             if (axios.isAxiosError(error) && error.response && error.response.status === 402) {
+                // If we used a cached stream ID and got 402, it means it expired or ran out.
+                if (cachedStream) {
+                    console.log("[FlowPaySDK] Cached stream failed. Clearing cache and renegotiating...");
+                    this.activeStreams.delete(host);
+                }
+
                 console.log("[FlowPaySDK] 402 Payment Required intercepted. Negotiating...");
-                return this.handlePaymentRequired(url, options, error.response);
+                return this.handlePaymentRequired(url, options, error.response); // Pass original options
             }
             throw error;
         }
     }
 
     private async handlePaymentRequired(url: string, options: AxiosRequestConfig, response: AxiosResponse): Promise<AxiosResponse> {
+        this.metrics.signersTriggered++; // Negotiation requires signing
+
         const headers = response.headers;
-        const mode = headers['x-flowpay-mode'];
+        const mode = headers['x-flowpay-mode']; // 'streaming' or 'hybrid' (not robust yet, server sends fixed 'streaming' usually)
+        // Let's assume server might send 'hybrid' or we decide based on capability.
+
         const rate = headers['x-flowpay-rate']; // amount per second or per request
-        const mneeAddress = headers['x-mnee-address']; // Token address (optional, maybe contract knows it)
+        const mneeAddress = headers['x-mnee-address']; // Token address
         const contractAddress = headers['x-flowpay-contract'];
 
         if (!contractAddress) {
             throw new Error("Missing X-FlowPay-Contract header in 402 response");
         }
 
-        if (mode !== 'streaming') {
-            throw new Error(`FlowPaySDK currently only supports 'streaming' mode. Got: ${mode}`);
+        // AI Decision Point
+        const simN = (options.headers as any)?.['x-simulation-n'] ? parseInt((options.headers as any)['x-simulation-n'] as string) : 10;
+        const selectedMode = await this.selectPaymentMode(simN); // Await async brain
+
+        if (selectedMode === 'direct') {
+            const price = ethers.parseEther(rate || "0.0001");
+            return this.performDirectPayment(url, options, mneeAddress, price);
         }
 
-        // 1. Create a Stream
+
+        // Fallback or Stream Selection
+        if (mode !== 'streaming' && mode !== 'hybrid') { // Server usually sends 'streaming'
+            // If server enforces something else, error.
+            // But if we chose stream, we proceed.
+            throw new Error(`FlowPaySDK currently only supports 'streaming' or 'hybrid' mode. Got: ${mode}`);
+        }
+
+        // 1. Create a Stream (Existing Logic)
         // Decide on duration/amount. For this "Hackathon MVP", let's hardcode a top-up
         // e.g., 1 hour worth of streaming or a fixed small deposit.
         const duration = 3600; // 1 hour
@@ -72,23 +174,36 @@ export class FlowPaySDK {
 
         console.log(`[FlowPaySDK] Initiating Stream: ${ethers.formatEther(totalAmount)} MNEE for ${duration}s`);
 
-        const streamId = await this.createStream(contractAddress, mneeAddress, totalAmount, duration);
+        const streamData = await this.createStream(contractAddress, mneeAddress, totalAmount, duration);
+
+        // Cache the new stream for this host
+        const host = new URL(url).host;
+        this.activeStreams.set(host, {
+            streamId: streamData.streamId,
+            startTime: Number(streamData.startTime),
+            rate: rateBn,
+            amount: totalAmount
+        });
 
         // 2. Retry Request with Header
-        console.log(`[FlowPaySDK] Stream #${streamId} created. Retrying request...`);
+        console.log(`[FlowPaySDK] Stream #${streamData.streamId} created. Retrying request...`);
 
         const retryOptions = {
             ...options,
             headers: {
                 ...options.headers,
-                'X-FlowPay-Stream-ID': streamId
+                'X-FlowPay-Stream-ID': streamData.streamId
             }
         };
+
+        if (this.apiKey) {
+            (retryOptions.headers as any)['x-api-key'] = this.apiKey;
+        }
 
         return await axios(url, retryOptions);
     }
 
-    public async createStream(contractAddress: string, tokenAddress: string, amount: bigint, duration: number): Promise<string> {
+    public async createStream(contractAddress: string, tokenAddress: string, amount: bigint, duration: number): Promise<{ streamId: string, startTime: bigint }> {
         const flowPay = new Contract(contractAddress, this.MIN_ABI, this.wallet);
 
         // If token address is not provided in header, try fetching from contract
@@ -179,7 +294,49 @@ export class FlowPaySDK {
 
         const parsed = flowPay.interface.parseLog(log);
         const streamId = parsed?.args[0].toString();
+        const startTime = parsed?.args[4]; // args[4] is startTime based on ABI event def
 
-        return streamId;
+        return { streamId, startTime };
+    }
+
+    public calculateClaimable(stream: StreamMetadata): bigint {
+        const now = BigInt(Math.floor(Date.now() / 1000));
+        const start = BigInt(stream.startTime);
+        if (now <= start) return 0n;
+
+        const elapsed = now - start;
+        return elapsed * stream.rate;
+    }
+
+    public calculateRemaining(stream: StreamMetadata): bigint {
+        const claimable = this.calculateClaimable(stream);
+        const remaining = stream.amount - claimable;
+        return remaining > 0n ? remaining : 0n;
+    }
+
+    private async performDirectPayment(url: string, options: AxiosRequestConfig, tokenAddress: string, amount: bigint): Promise<AxiosResponse> {
+        console.log(`[FlowPaySDK] Executing Direct Payment of ${ethers.formatEther(amount)} MNEE`);
+
+        const recipient = tokenAddress; // Using Token Address as recipient per discussed MVP hack
+        const token = new Contract(tokenAddress, this.ERC20_ABI, this.wallet);
+
+        const tx = await token.transfer(recipient, amount);
+        await tx.wait();
+
+        console.log(`[FlowPaySDK] Direct Payment Sent: ${tx.hash}`);
+
+        const retryOptions = {
+            ...options,
+            headers: {
+                ...options.headers,
+                'X-FlowPay-Tx-Hash': tx.hash
+            }
+        };
+
+        if (this.apiKey) {
+            (retryOptions.headers as any)['x-api-key'] = this.apiKey;
+        }
+
+        return await axios(url, retryOptions);
     }
 }

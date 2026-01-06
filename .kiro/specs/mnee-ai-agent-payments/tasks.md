@@ -60,15 +60,15 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
   - Build API key authentication system
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.6, 5.3, 5.5, 5.7_
 
-- [ ]* 4.1 Write property test for x402 response parsing and retry
+- [ ] 4.1 Write property test for x402 response parsing and retry
   - **Property 4: x402 Response Parsing and Retry**
   - **Validates: Requirements 5.3, 5.7**
 
-- [ ]* 4.2 Write property test for automatic stream creation
+- [ ] 4.2 Write property test for automatic stream creation
   - **Property 9: Automatic Stream Creation from 402**
   - **Validates: Requirements 3.2, 3.6, 5.5**
 
-- [ ]* 4.3 Write property test for API key authentication
+- [ ] 4.3 Write property test for API key authentication
   - **Property 14: API Key Authentication**
   - **Validates: Requirements 3.4**
 
