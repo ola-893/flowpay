@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-full;
+  }
+  body {
+    @apply bg-[#0b0f1a] text-white antialiased font-sans;
+    background-image: radial-gradient(1200px 600px at 50% -10%, rgba(14,165,233,0.15), transparent 60%), radial-gradient(1000px 600px at 90% 10%, rgba(168,85,247,0.12), transparent 60%), radial-gradient(1000px 600px at 10% 10%, rgba(6,182,212,0.12), transparent 60%);
+  }
+}
+
+@layer components {
+  .card-glass {
+    @apply rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md shadow-xl shadow-cyan-500/10;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 to-violet-500 px-5 py-2.5 font-semibold text-white shadow-glow transition hover:opacity-90 active:opacity-80;
+  }
+  .btn-default {
+    @apply inline-flex items-center justify-center rounded-xl bg-white/10 px-4 py-2 font-medium text-white/90 hover:bg-white/15 active:bg-white/20;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center rounded-xl bg-rose-600/90 px-4 py-2 font-semibold text-white hover:bg-rose-600;
+  }
+  .chip {
+    @apply rounded-full bg-white/10 px-3 py-1 text-xs font-mono text-white/70;
+  }
+}
+

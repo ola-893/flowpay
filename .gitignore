@@ -1,0 +1,40 @@
+# Root
+node_modules/
+artifacts/
+cache/
+coverage/
+typechain/
+hardhat.cache
+.env
+.env.*
+ignition/deployments/
+
+# Frontend
+vite-project/node_modules/
+vite-project/dist/
+vite-project/.env
+vite-project/.env.*
+vite-project/.vite/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+node_modules
+.env
+
+# Hardhat files
+/cache
+/artifacts
+
+# TypeChain files
+/typechain
+/typechain-types
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337

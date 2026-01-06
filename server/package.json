@@ -1,0 +1,21 @@
+{
+    "name": "flowpay-middleware-server",
+    "version": "1.0.0",
+    "description": "x402 Express Middleware server for FlowPay",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "ech \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "express": "^4.18.2",
+        "ethers": "^6.11.1",
+        "dotenv": "^16.4.5",
+        "cors": "^2.8.5"
+    },
+    "devDependencies": {
+        "supertest": "^6.3.4",
+        "chai": "^4.3.7",
+        "mocha": "^10.2.0"
+    }
+}
