@@ -96,9 +96,12 @@ const flowPayMiddleware = (config) => {
             }
         }
 
+        // Calculate required amount from route config
+        const requiredAmount = ethers.parseEther(routeConfig.price || '0');
+
         // 2. Check for Stream ID Header
         if (!streamIdHeader) {
-            return send402Response(res, routeConfig, config);
+            return send402Response(res, routeConfig, config, requiredAmount);
         }
 
         try {
@@ -129,15 +132,16 @@ const flowPayMiddleware = (config) => {
         } catch (error) {
             console.error("[FlowPay] Stream verification failed:", error);
             // Fallback to 402 if verification crashes (safe default)
-            return send402Response(res, routeConfig, config);
+            const requiredAmountFallback = ethers.parseEther(routeConfig.price || '0');
+            return send402Response(res, routeConfig, config, requiredAmountFallback);
         }
     };
 };
 
-function send402Response(res, routeConfig, config) {
+function send402Response(res, routeConfig, config, requiredAmount) {
     res.set('X-Payment-Required', 'true');
     res.set('X-FlowPay-Mode', routeConfig.mode || 'streaming');
-    res.set('X-FlowPay-Rate', routeConfig.price || '0');
+    res.set('X-FlowPay-Rate', ethers.formatEther(requiredAmount)); // Send resolved rate
     res.set('X-MNEE-Address', config.mneeAddress || '');
     res.set('X-FlowPay-Contract', config.flowPayContractAddress || '');
     // Standard 402 body
@@ -145,7 +149,7 @@ function send402Response(res, routeConfig, config) {
         message: "Payment Required",
         requirements: {
             mode: routeConfig.mode || 'streaming',
-            price: routeConfig.price,
+            price: ethers.formatEther(requiredAmount), // Use the resolved rate
             currency: "MNEE",
             contract: config.flowPayContractAddress,
             recipient: config.mneeAddress // Assuming server wallet is MNEE recipient
@@ -154,3 +158,4 @@ function send402Response(res, routeConfig, config) {
 }
 
 module.exports = flowPayMiddleware;
+

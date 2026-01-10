@@ -1,12 +1,14 @@
 {
     "name": "flowpay-sdk",
     "version": "1.0.0",
-    "description": "TypeScript SDK for FlowPay negotiation",
+    "description": "TypeScript SDK for FlowPay negotiation - The Streaming Extension for x402",
     "main": "dist/FlowPaySDK.js",
     "types": "dist/FlowPaySDK.d.ts",
     "scripts": {
         "build": "tsc",
-        "test": "mocha -r ts-node/register test/sdk.test.ts"
+        "test": "mocha -r ts-node/register test/sdk.test.ts",
+        "test:all": "mocha -r ts-node/register test/*.test.ts",
+        "test:integration": "mocha -r ts-node/register test/integration.test.ts"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",

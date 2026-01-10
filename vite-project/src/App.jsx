@@ -1,17 +1,38 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ethers } from 'ethers';
-import { contractAddress, contractABI } from './contactInfo.js';
+import { contractAddress, contractABI, mneeTokenAddress, mneeTokenABI } from './contactInfo.js';
 import Header from './components/Header.jsx';
 import Hero from './components/Hero.jsx';
 import CreateStreamForm from './components/CreateStreamForm.jsx';
 import StreamList from './components/StreamList.jsx';
+import { AgentConsole } from './components/AgentConsole.jsx';
+import { DecisionLog } from './components/DecisionLog.jsx';
+import { StreamMonitor } from './components/StreamMonitor.jsx';
+import { ServiceGraph } from './components/ServiceGraph.jsx';
+import { EfficiencyMetrics } from './components/EfficiencyMetrics.jsx';
+import { 
+  MobileBottomNav, 
+  CollapsibleSection,
+  ToastProvider, 
+  useToast,
+  ErrorBoundary,
+  SkeletonDashboard,
+  SkeletonAgentConsole,
+  SkeletonDecisionLog,
+  SkeletonStreamCard,
+  EmptyState,
+  LoadingState,
+  WalletNotConnected
+} from './components/ui';
 
 const TARGET_CHAIN_ID_DEC = 11155111; // Sepolia
 const ALT_CHAIN_ID_DEC = 11155111; // Allow same for now
 const TARGET_CHAIN_ID_HEX = '0x' + TARGET_CHAIN_ID_DEC.toString(16);
 const ALT_CHAIN_ID_HEX = '0x' + ALT_CHAIN_ID_DEC.toString(16);
 
-function App() {
+// Inner App component that uses toast
+function AppContent() {
+  const toast = useToast();
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [walletAddress, setWalletAddress] = useState(null);
@@ -25,16 +46,80 @@ function App() {
   const [incomingStreams, setIncomingStreams] = useState([]);
   const [outgoingStreams, setOutgoingStreams] = useState([]);
   const [isLoadingStreams, setIsLoadingStreams] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   // Manual withdraw UI state
   const [manualStreamId, setManualStreamId] = useState('');
   const [claimableBalance, setClaimableBalance] = useState('0.0');
   const [isProcessing, setIsProcessing] = useState(false);
   const [myStreamIds, setMyStreamIds] = useState([]);
+  const [mneeBalance, setMneeBalance] = useState('0.0');
+
+  // FlowPay Dashboard State
+  const [agentConfig, setAgentConfig] = useState({ agentId: 'Dashboard-Agent', spendingLimits: { dailyLimit: '100' } });
+  const [isPaused, setIsPaused] = useState(false);
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [decisionLogs, setDecisionLogs] = useState([
+    { timestamp: Date.now() - 120000, mode: 'stream', reasoning: 'High volume detected (50+ requests). Streaming is 40% cheaper.', volume: 50 },
+    { timestamp: Date.now() - 60000, mode: 'direct', reasoning: 'Low traffic. Direct payment is optimal.', volume: 2 },
+  ]);
+  const [efficiencyMetrics, setEfficiencyMetrics] = useState({ requestsSent: 47, signersTriggered: 2 });
+
+  // Convert outgoing streams to StreamMonitor format
+  const activeStreamsForMonitor = useMemo(() => {
+    return outgoingStreams.map(s => ({
+      streamId: s.id?.toString() || '0',
+      startTime: Number(s.startTime || 0),
+      rate: s.flowRate || BigInt(0),
+      amount: s.totalAmount || BigInt(0),
+      agentId: agentConfig.agentId
+    }));
+  }, [outgoingStreams, agentConfig.agentId]);
 
   const addMyStreamId = (idNumber) => {
     if (!Number.isFinite(idNumber) || idNumber <= 0) return;
     setMyStreamIds((prev) => (prev.includes(idNumber) ? prev : [...prev, idNumber]));
+  };
+
+  // Fetch MNEE balance
+  const fetchMneeBalance = async () => {
+    if (!provider || !walletAddress) return;
+    try {
+      const mneeContract = new ethers.Contract(mneeTokenAddress, mneeTokenABI, provider);
+      const balance = await mneeContract.balanceOf(walletAddress);
+      setMneeBalance(ethers.formatEther(balance));
+    } catch (error) {
+      console.error('Failed to fetch MNEE balance:', error);
+    }
+  };
+
+  // Mint MNEE tokens for testing
+  const mintMneeTokens = async (amount = '1000') => {
+    if (!signer || !walletAddress) {
+      toast.warning('Please connect your wallet first');
+      return;
+    }
+    try {
+      setIsProcessing(true);
+      setStatus('Minting MNEE tokens...');
+      const loadingToast = toast.transaction.pending('Minting MNEE tokens...');
+      
+      const mneeContract = new ethers.Contract(mneeTokenAddress, mneeTokenABI, signer);
+      const amountWei = ethers.parseEther(amount);
+      const tx = await mneeContract.mint(walletAddress, amountWei);
+      await tx.wait();
+      
+      toast.dismiss(loadingToast);
+      toast.success(`Minted ${amount} MNEE tokens!`, { title: 'Mint Successful' });
+      setStatus(`Minted ${amount} MNEE tokens.`);
+      await fetchMneeBalance();
+    } catch (error) {
+      console.error('Mint failed:', error);
+      toast.error(error?.shortMessage || error?.message || 'Mint failed', { title: 'Mint Failed' });
+      setStatus(error?.shortMessage || error?.message || 'Mint failed.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const contractWithProvider = useMemo(() => {
@@ -97,6 +182,7 @@ function App() {
   const connectWallet = async () => {
     if (typeof window.ethereum === 'undefined') {
       setStatus('Please install MetaMask.');
+      toast.error('MetaMask not found', { title: 'Wallet Error' });
       return;
     }
     try {
@@ -112,9 +198,11 @@ function App() {
       setSigner(nextSigner);
       setWalletAddress(address);
       setStatus('Connected');
+      toast.success(`Connected to ${address.slice(0, 6)}...${address.slice(-4)}`, { title: 'Wallet Connected' });
     } catch (error) {
       console.error('Connection failed:', error);
       setStatus('Connection failed.');
+      toast.error(error?.message || 'Failed to connect wallet', { title: 'Connection Failed' });
     }
   };
 
@@ -141,21 +229,8 @@ function App() {
         return;
       }
       setStatus('Approving MNEE...');
-      // Note: In a real app we would import the ERC20 ABI and call approve here.
-      // For now, we assume the user has already approved or we rely on the contract to handle it (which it can't without approval).
-      // Since this is a frontend update, we need to add the MNEE approval step.
-      // However, to keep it simple and consistent with the plan, I will just call createStream with the new signature.
-      // But wait! usage of `value` is removed in favor of ERC20 transfer.
-      // I need to update this logic significantly to support ERC20 approval.
-
-      // Let's assume we have an IERC20 ABI available or generic ERC20 calls.
-      // I will create a helper for this or just do it inline if I can.
-
-      const mneeAddress = await contractWithSigner.mneeToken();
-      const mneeContract = new ethers.Contract(mneeAddress, [
-        "function approve(address spender, uint256 amount) external returns (bool)",
-        "function allowance(address owner, address spender) external view returns (uint256)"
-      ], signer);
+      // Use the imported MNEE token address and ABI
+      const mneeContract = new ethers.Contract(mneeTokenAddress, mneeTokenABI, signer);
 
       const currentAllowance = await mneeContract.allowance(await signer.getAddress(), contractAddress);
       if (currentAllowance < totalAmountWei) {
@@ -205,8 +280,10 @@ function App() {
         addMyStreamId(createdId);
         setStatus(`Stream created. ID #${createdId}`);
         setManualStreamId(String(createdId));
+        toast.stream.created(createdId);
       } else {
         setStatus(`Stream created. (ID not detected, check dashboard)`);
+        toast.success('Stream created successfully', { title: 'Stream Created' });
       }
       setRecipient('');
       setAmountEth('');
@@ -217,8 +294,10 @@ function App() {
       const raw = `${error?.shortMessage || error?.message || ''}`.toLowerCase();
       if (raw.includes('missing revert data')) {
         setStatus('Transaction reverted. Check inputs and wallet balance.');
+        toast.error('Transaction reverted. Check inputs and wallet balance.', { title: 'Transaction Failed' });
       } else {
         setStatus(error?.shortMessage || error?.message || 'Transaction failed.');
+        toast.error(error?.shortMessage || error?.message || 'Transaction failed', { title: 'Stream Creation Failed' });
       }
     }
     finally {
@@ -258,20 +337,25 @@ function App() {
   const handleWithdrawManual = async () => {
     if (!contractWithSigner) {
       setStatus('Please connect your wallet.');
+      toast.warning('Please connect your wallet first');
       return;
     }
     try {
       const id = parseInt(manualStreamId || '0', 10);
       if (!Number.isFinite(id) || id <= 0) {
         setStatus('Enter a valid stream ID.');
+        toast.warning('Enter a valid stream ID');
         return;
       }
       setStatus('Sending withdraw transaction...');
       setIsProcessing(true);
+      const loadingToast = toast.transaction.pending('Processing withdrawal...');
       const tx = await contractWithSigner.withdrawFromStream(id);
       setStatus('Waiting for confirmation...');
       await tx.wait();
+      toast.dismiss(loadingToast);
       setStatus('Withdraw successful.');
+      toast.stream.withdrawn(claimableBalance);
       addMyStreamId(id);
       await refreshStreams();
       // Refresh claimable for convenience
@@ -279,6 +363,7 @@ function App() {
     } catch (error) {
       console.error('Withdraw failed:', error);
       setStatus(error?.shortMessage || error?.message || 'Withdraw failed.');
+      toast.transaction.error(error?.shortMessage || error?.message || 'Withdraw failed');
     }
     finally {
       setIsProcessing(false);
@@ -335,11 +420,13 @@ function App() {
     setIncomingStreams(incoming);
     setOutgoingStreams(outgoing);
     setIsLoadingStreams(false);
+    setIsInitialLoad(false);
   };
 
   useEffect(() => {
     if (!walletAddress || !contractWithProvider) return;
     refreshStreams();
+    fetchMneeBalance();
     // Listen for new streams and updates
     const createdListener = () => refreshStreams();
     const cancelledListener = () => refreshStreams();
@@ -383,14 +470,18 @@ function App() {
     try {
       setStatus('Withdrawing...');
       setIsProcessing(true);
+      const loadingToast = toast.transaction.pending('Processing withdrawal...');
       const tx = await contractWithSigner.withdrawFromStream(streamId);
       await tx.wait();
+      toast.dismiss(loadingToast);
       setStatus('Withdrawn.');
+      toast.success(`Withdrawn from Stream #${streamId}`, { title: 'Withdrawal Complete' });
       addMyStreamId(Number(streamId));
       await refreshStreams();
     } catch (e) {
       console.error(e);
       setStatus(e?.shortMessage || e?.message || 'Withdraw failed.');
+      toast.error(e?.shortMessage || e?.message || 'Withdraw failed', { title: 'Withdrawal Failed' });
     }
     finally {
       setIsProcessing(false);
@@ -402,14 +493,18 @@ function App() {
     try {
       setStatus('Cancelling stream...');
       setIsProcessing(true);
+      const loadingToast = toast.transaction.pending('Cancelling stream...');
       const tx = await contractWithSigner.cancelStream(streamId);
       await tx.wait();
+      toast.dismiss(loadingToast);
       setStatus('Stream cancelled.');
+      toast.stream.cancelled(streamId);
       addMyStreamId(Number(streamId));
       await refreshStreams();
     } catch (e) {
       console.error(e);
       setStatus(e?.shortMessage || e?.message || 'Cancel failed.');
+      toast.error(e?.shortMessage || e?.message || 'Cancel failed', { title: 'Cancellation Failed' });
     }
     finally {
       setIsProcessing(false);
@@ -427,28 +522,74 @@ function App() {
   const nowSec = Math.floor(Date.now() / 1000);
   const isWorking = isProcessing;
 
-  return (
-    <div className="min-h-screen w-full">
-      <div className="absolute inset-0 bg-grid bg-[size:24px_24px] opacity-20 pointer-events-none" />
+  // Render loading skeleton for initial load
+  const renderDashboardContent = () => {
+    if (isInitialLoad && isLoadingStreams) {
+      return <SkeletonDashboard />;
+    }
+    return (
+      <div className="space-y-8 md:space-y-12">
+        <CollapsibleSection title="Stream Monitor" icon="🌊" defaultOpen={true}>
+          <StreamMonitor activeStreams={activeStreamsForMonitor} />
+        </CollapsibleSection>
+        <CollapsibleSection title="Efficiency Metrics" icon="📈" defaultOpen={true}>
+          <EfficiencyMetrics efficiencyMetrics={efficiencyMetrics} />
+        </CollapsibleSection>
+        <CollapsibleSection title="Service Graph" icon="🔗" defaultOpen={false} className="desktop-only">
+          <ServiceGraph />
+        </CollapsibleSection>
+      </div>
+    );
+  };
 
-      <Header
-        walletAddress={walletAddress}
-        chainId={chainId}
-        networkName={getNetworkName(chainId)}
-        onConnect={connectWallet}
-      />
+  const renderStreamsContent = () => {
+    if (isInitialLoad && isLoadingStreams) {
+      return (
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <SkeletonStreamCard key={i} />
+          ))}
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-8 md:space-y-12">
+        {/* MNEE Token Balance Card */}
+        <section className="card-glass p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">💰 MNEE Token Balance</h3>
+              <p className="text-2xl font-mono text-cyan-300">
+                {Number(mneeBalance).toLocaleString(undefined, { maximumFractionDigits: 4 })} MNEE
+              </p>
+              <p className="text-xs text-white/50 mt-1 font-mono truncate">
+                Token: {mneeTokenAddress}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="btn-default min-h-[44px] px-4"
+                onClick={fetchMneeBalance}
+                disabled={isProcessing}
+              >
+                Refresh
+              </button>
+              <button
+                type="button"
+                className="btn-primary min-h-[44px] px-4"
+                onClick={() => mintMneeTokens('1000')}
+                disabled={isProcessing}
+              >
+                Mint 1000 MNEE
+              </button>
+            </div>
+          </div>
+        </section>
 
-      <Hero networkName={getNetworkName(chainId)} />
-
-      <main className="mx-auto w-full max-w-6xl px-4 pb-16">
-        <section className="mt-8 grid gap-6 md:grid-cols-2">
-          <div className="card-glass relative p-6 sm:p-8">
-            <div className="absolute -top-10 right-6 hidden h-20 w-20 animate-float rounded-full bg-hero opacity-20 blur-2xl sm:block" />
-            <h2 className="bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400 bg-clip-text text-2xl font-bold text-transparent sm:text-3xl">
-              Create Stream
-            </h2>
-            <p className="mt-1 text-sm text-white/60">Funds stream per second. Flow rate = total / duration.</p>
-
+        <section className="grid gap-4 md:gap-6 lg:grid-cols-2">
+          <CollapsibleSection title="Create Stream" icon="➕" defaultOpen={true}>
+            <p className="text-sm text-white/50 mb-4">Funds stream per second using MNEE tokens. Flow rate = total / duration.</p>
             <CreateStreamForm
               recipient={recipient}
               setRecipient={setRecipient}
@@ -458,53 +599,48 @@ function App() {
               setDurationSeconds={setDurationSeconds}
               onSubmit={handleCreateStream}
             />
-          </div>
+          </CollapsibleSection>
 
-          <aside className="card-glass relative p-6 sm:p-8">
-            <div className="absolute -top-10 right-6 hidden h-20 w-20 animate-float rounded-full bg-hero opacity-20 blur-2xl sm:block" />
-            <h2 className="bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400 bg-clip-text text-2xl font-bold text-transparent sm:text-3xl">
-              Withdraw from a Stream
-            </h2>
-            <p className="mt-1 text-sm text-white/60">Enter a stream ID to check and withdraw claimable funds.</p>
-
-            <div className="mt-6 grid grid-cols-1 gap-4">
+          <CollapsibleSection title="Withdraw Funds" icon="💰" defaultOpen={true}>
+            <p className="text-sm text-white/60 mb-4">Enter a stream ID to check and withdraw claimable MNEE funds.</p>
+            <div className="grid grid-cols-1 gap-4">
               <label>
-                <span className="block text-sm text-white/70">Stream ID</span>
+                <span className="block text-sm text-white/70 mb-1.5">Stream ID</span>
                 <input
                   type="number"
                   min={1}
                   placeholder="e.g. 1"
                   value={manualStreamId}
                   onChange={(e) => setManualStreamId(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-cyan-400 focus:ring-cyan-400"
+                  className="input-default w-full"
                 />
               </label>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <button type="button" className="btn-default" onClick={checkClaimableBalance}>
-                  Check Claimable Balance
+              <div className="flex flex-col sm:flex-row gap-2">
+                <button type="button" className="btn-default flex-1 min-h-[44px]" onClick={checkClaimableBalance}>
+                  Check Balance
                 </button>
                 <button
                   type="button"
-                  className="btn-primary"
+                  className="btn-primary flex-1 min-h-[44px]"
                   onClick={handleWithdrawManual}
                   disabled={!manualStreamId || parseFloat(claimableBalance || '0') <= 0}
                 >
-                  Withdraw Funds
+                  Withdraw
                 </button>
               </div>
 
               <p className="text-sm text-white/70">
-                Can Withdraw: <span className="font-mono text-cyan-300">{Number(claimableBalance || '0').toLocaleString(undefined, { maximumFractionDigits: 6 })}</span> ETH
+                Can Withdraw: <span className="font-mono text-cyan-300">{Number(claimableBalance || '0').toLocaleString(undefined, { maximumFractionDigits: 6 })}</span> MNEE
               </p>
             </div>
-          </aside>
+          </CollapsibleSection>
         </section>
 
-        <section className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-2">
           <StreamList
             title="Incoming Streams"
-            emptyText="No incoming streams."
+            emptyText="No incoming streams found."
             isLoading={isLoadingStreams}
             streams={incomingStreams}
             variant="incoming"
@@ -512,7 +648,6 @@ function App() {
             onWithdraw={withdraw}
             onCancel={cancel}
           />
-
           <StreamList
             title="Outgoing Streams"
             emptyText="No outgoing streams."
@@ -522,28 +657,121 @@ function App() {
             formatEth={formatEth}
             onCancel={cancel}
           />
-        </section>
+        </div>
+      </div>
+    );
+  };
 
-        <div className="pointer-events-none fixed bottom-6 left-1/2 z-50 w-[92%] max-w-3xl -translate-x-1/2">
-          <div className="pointer-events-auto card-glass flex items-center gap-3 px-4 py-3">
-            <div
-              className={`h-2 w-2 rounded-full ${isWorking ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400'
-                }`}
-            />
-            <div className="font-mono text-sm sm:text-base text-white/90 truncate flex items-center gap-2">
-              {isWorking && (
-                <svg className="h-4 w-4 animate-spin text-cyan-300" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-                </svg>
-              )}
-              <span className="truncate">{status}</span>
+  const renderAgentContent = () => {
+    if (isInitialLoad) {
+      return <SkeletonAgentConsole />;
+    }
+    return (
+      <div className="space-y-6 md:space-y-8">
+        <ErrorBoundary variant="inline">
+          <AgentConsole
+            config={agentConfig}
+            setConfig={setAgentConfig}
+            isPaused={isPaused}
+            setIsPaused={setIsPaused}
+          />
+        </ErrorBoundary>
+        <ErrorBoundary variant="inline">
+          <DecisionLog logs={decisionLogs} />
+        </ErrorBoundary>
+      </div>
+    );
+  };
+
+  const renderAnalyticsContent = () => {
+    return (
+      <div className="space-y-6 md:space-y-8">
+        <ErrorBoundary variant="inline">
+          <EfficiencyMetrics efficiencyMetrics={efficiencyMetrics} />
+        </ErrorBoundary>
+        <ErrorBoundary variant="inline">
+          <ServiceGraph />
+        </ErrorBoundary>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen w-full">
+      <div className="absolute inset-0 bg-grid bg-[size:24px_24px] opacity-20 pointer-events-none" />
+
+      <Header
+        walletAddress={walletAddress}
+        chainId={chainId}
+        networkName={getNetworkName(chainId)}
+        onConnect={connectWallet}
+        balance={claimableBalance}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+
+      <Hero networkName={getNetworkName(chainId)} />
+
+      <main className="mx-auto w-full max-w-7xl px-4 pb-24 md:pb-16">
+        <ErrorBoundary>
+          {activeTab === 'dashboard' && (
+            <div className="mt-6 md:mt-8 animate-fade-in">
+              {renderDashboardContent()}
             </div>
+          )}
+
+          {activeTab === 'streams' && (
+            <div className="mt-6 md:mt-8 animate-fade-in">
+              {renderStreamsContent()}
+            </div>
+          )}
+
+          {activeTab === 'agent' && (
+            <div className="mt-6 md:mt-8 animate-fade-in">
+              {renderAgentContent()}
+            </div>
+          )}
+
+          {activeTab === 'analytics' && (
+            <div className="mt-6 md:mt-8 animate-fade-in">
+              {renderAnalyticsContent()}
+            </div>
+          )}
+        </ErrorBoundary>
+      </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        walletAddress={walletAddress}
+      />
+
+      {/* Status Bar */}
+      <div className="pointer-events-none fixed bottom-20 md:bottom-6 left-1/2 z-40 w-[92%] max-w-3xl -translate-x-1/2">
+        <div className="pointer-events-auto card-glass flex items-center gap-3 px-4 py-3">
+          <div
+            className={`h-2 w-2 rounded-full ${isWorking ? 'bg-cyan-400 animate-pulse' : 'bg-emerald-400'
+              }`}
+          />
+          <div className="font-mono text-sm sm:text-base text-white/90 truncate flex items-center gap-2">
+            {isWorking && (
+              <svg className="h-4 w-4 animate-spin text-cyan-300" viewBox="0 0 24 24" fill="none">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+            )}
+            <span className="truncate">{status}</span>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
+}
+
+// Main App wrapper
+function App() {
+  return <AppContent />;
 }
 
 export default App;

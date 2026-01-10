@@ -1,0 +1,9 @@
+root: ./
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md
+
+redirects:
+  quickstart: getting-started/quick-start.md
+  install: getting-started/installation.md

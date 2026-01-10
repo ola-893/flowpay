@@ -1,11 +1,15 @@
 import axios, { AxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { ethers, Contract, Wallet, JsonRpcProvider } from 'ethers';
 import { GeminiPaymentBrain } from './GeminiPaymentBrain';
+import { SpendingMonitor, SpendingLimits } from './SpendingMonitor';
 
 export interface FlowPayConfig {
     privateKey: string;
     rpcUrl: string;
     apiKey?: string;
+
+    spendingLimits?: SpendingLimits;
+    agentId?: string;
 }
 
 export interface StreamMetadata {
@@ -19,10 +23,12 @@ export class FlowPaySDK {
     private wallet: Wallet;
     private provider: JsonRpcProvider;
     private apiKey?: string;
+    private agentId?: string;
 
-    // Cache active streams by Host -> Metadata
     private activeStreams: Map<string, StreamMetadata> = new Map();
     public brain: GeminiPaymentBrain;
+    public monitor: SpendingMonitor;
+    private isPaused: boolean = false;
 
     private MIN_ABI = [
         "function createStream(address recipient, uint256 duration, uint256 amount, string metadata) external",
@@ -46,6 +52,13 @@ export class FlowPaySDK {
         // Let's assume config might have `geminiKey` added to interface or we use env var?
         // Let's modify interface locally or just pass undefined to safe-fail.
         this.brain = new GeminiPaymentBrain(process.env.GEMINI_API_KEY); // Assuming env var for Security
+        this.agentId = config.agentId;
+
+        // Default Limits: 100 MNEE daily, 1000 Total
+        this.monitor = new SpendingMonitor(config.spendingLimits || {
+            dailyLimit: ethers.parseEther("100"),
+            totalLimit: ethers.parseEther("1000")
+        });
     }
 
     // Metric counters
@@ -59,6 +72,16 @@ export class FlowPaySDK {
      */
     public getMetrics() {
         return this.metrics;
+    }
+
+    public emergencyStop() {
+        this.isPaused = true;
+        console.warn("[FlowPaySDK] 🚨 EMERGENCY STOP ACTIVATED. All payments paused.");
+    }
+
+    public resume() {
+        this.isPaused = false;
+        console.log("[FlowPaySDK] ✅ System Resumed.");
     }
 
 
@@ -85,6 +108,9 @@ export class FlowPaySDK {
      * Makes an HTTP request with automatic x402 handling
      */
     public async makeRequest(url: string, options: AxiosRequestConfig = {}): Promise<AxiosResponse> {
+        if (this.isPaused) {
+            throw new Error("FlowPaySDK is paused due to Emergency Stop.");
+        }
         this.metrics.requestsSent++;
 
         // Host extraction for simple caching key
@@ -110,7 +136,20 @@ export class FlowPaySDK {
                     console.log("[FlowPaySDK] Cached stream depleted. Clearing cache...");
                     this.activeStreams.delete(host);
                 } else {
-                    (headers as any)['X-FlowPay-Stream-ID'] = cachedStream.streamId;
+                    // AUTO-RENEWAL CHECK
+                    // If remaining < 10% of total amount, try to renew (create NEW stream) in background or pre-emptively?
+                    // For simplicity, let's just clear cache if it's VERY low so next request triggers negotiation/top-up.
+                    // Or we can be smarter: if < threshold, we delete it so we force a 402 and a new stream creation.
+                    // Threshold: 10%
+                    const threshold = cachedStream.amount * 10n / 100n;
+                    if (remaining < threshold) {
+                        console.log("[FlowPaySDK] Stream balance low (<10%). Triggering renewal...");
+                        this.activeStreams.delete(host);
+                        // We delete it so the request goes through without header, gets 402, and creates NEW stream.
+                        // This is "Lazy Renewal".
+                    } else {
+                        (headers as any)['X-FlowPay-Stream-ID'] = cachedStream.streamId;
+                    }
                 }
             }
 
@@ -172,9 +211,30 @@ export class FlowPaySDK {
         const rateBn = ethers.parseEther(rate || "0.0001");
         const totalAmount = rateBn * BigInt(duration);
 
+
+
+        // SAFETY CHECKS
+        try {
+            this.monitor.checkAndRecordSpend(totalAmount);
+        } catch (e: any) {
+            console.error(`[FlowPaySDK] Spend Declined: ${e.message}`);
+            throw e; // Stop payment
+        }
+
+        // Suspicious Activity Check (Frequency of renewals)
+        if (this.monitor.checkSuspiciousActivity()) {
+            this.emergencyStop();
+            throw new Error("Suspicious renewal activity detected. System Emergency Paused.");
+        }
+
         console.log(`[FlowPaySDK] Initiating Stream: ${ethers.formatEther(totalAmount)} MNEE for ${duration}s`);
 
-        const streamData = await this.createStream(contractAddress, mneeAddress, totalAmount, duration);
+        console.log(`[FlowPaySDK] Initiating Stream: ${ethers.formatEther(totalAmount)} MNEE for ${duration}s`);
+
+        const streamData = await this.createStream(contractAddress, mneeAddress, totalAmount, duration, {
+            type: "SDK_AUTO",
+            target: url
+        });
 
         // Cache the new stream for this host
         const host = new URL(url).host;
@@ -203,8 +263,17 @@ export class FlowPaySDK {
         return await axios(url, retryOptions);
     }
 
-    public async createStream(contractAddress: string, tokenAddress: string, amount: bigint, duration: number): Promise<{ streamId: string, startTime: bigint }> {
+    public async createStream(contractAddress: string, tokenAddress: string, amount: bigint, duration: number, metadata: any = {}): Promise<{ streamId: string, startTime: bigint }> {
         const flowPay = new Contract(contractAddress, this.MIN_ABI, this.wallet);
+
+        // Metadata Construction
+        const enrichedMetadata = {
+            ...metadata,
+            agentId: this.agentId || "anonymous",
+            timestamp: Date.now(),
+            client: "FlowPaySDK/1.0"
+        };
+        const metadataString = JSON.stringify(enrichedMetadata);
 
         // If token address is not provided in header, try fetching from contract
         let mneeToken = tokenAddress;
@@ -280,7 +349,7 @@ export class FlowPaySDK {
 
         console.log(`[FlowPaySDK] Creating stream to ${recipient}...`);
 
-        const tx = await flowPay.createStream(recipient, duration, amount, "Agent SDK Payment");
+        const tx = await flowPay.createStream(recipient, duration, amount, metadataString);
         const receipt = await tx.wait();
 
         // Parse event to get ID
@@ -315,6 +384,11 @@ export class FlowPaySDK {
     }
 
     private async performDirectPayment(url: string, options: AxiosRequestConfig, tokenAddress: string, amount: bigint): Promise<AxiosResponse> {
+        if (this.isPaused) throw new Error("FlowPaySDK is paused.");
+
+        // SAFETY CHECK
+        this.monitor.checkAndRecordSpend(amount);
+
         console.log(`[FlowPaySDK] Executing Direct Payment of ${ethers.formatEther(amount)} MNEE`);
 
         const recipient = tokenAddress; // Using Token Address as recipient per discussed MVP hack
@@ -338,5 +412,16 @@ export class FlowPaySDK {
         }
 
         return await axios(url, retryOptions);
+    }
+    public getStreamDetails(streamId: string): any {
+        // In a real implementation this would fetch from Contract
+        // For MVP SDK, we rely on the creation logs or cached metadata if we stored it deeper.
+        // Currently we only store simple metadata in cache (StreamMetadata interface doesn't have the JSON blob).
+        // Let's assume this helper is future-proof or we can parse the cache if we expand it.
+        return {
+            streamId,
+            agentId: this.agentId || "unknown",
+            client: "FlowPaySDK/1.0"
+        };
     }
 }

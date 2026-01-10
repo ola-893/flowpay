@@ -344,6 +344,40 @@ GEMINI_API_KEY="your_gemini_api_key"
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
+### Switching from Mock MNEE to Mainnet MNEE
+
+The project uses a `MockMNEE` ERC-20 token for testnet development. When deploying to mainnet or using the real MNEE stablecoin, follow these steps:
+
+**MNEE Mainnet Contract:** `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`
+
+1. **Update the deployment script** (`scripts/deploy.js`):
+   ```javascript
+   // Replace MockMNEE deployment with mainnet address
+   const MNEE_MAINNET = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
+   
+   // Skip MockMNEE deployment, use mainnet address directly
+   const morphStream = await MorphStream.deploy(MNEE_MAINNET);
+   ```
+
+2. **Update environment variables** (`.env`):
+   ```env
+   # Use mainnet MNEE instead of mock
+   MNEE_CONTRACT=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
+   ```
+
+3. **Update frontend configuration** (`vite-project/src/contractInfo.js`):
+   ```javascript
+   export const mneeAddress = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
+   ```
+
+4. **Update SDK/server configuration** if applicable:
+   ```javascript
+   // In any config files referencing MNEE
+   const MNEE_ADDRESS = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
+   ```
+
+> **Note:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `MorphStream.sol` — it already uses the `IERC20` interface. The only difference is MockMNEE has a public `mint()` function for testing, which mainnet MNEE does not have (you'll need to acquire real MNEE tokens).
+
 ### 4. Configure Frontend
 
 Update `vite-project/src/contractInfo.js`:
