@@ -9,27 +9,40 @@ const docsContent = {
     content: `
 # Welcome to FlowPay
 
-**FlowPay** is a payment streaming platform built on Ethereum that enables continuous MNEE token transfers over time.
+**FlowPay** is the Streaming Extension for x402 - enabling both humans and AI agents to create continuous MNEE token payment streams.
 
 ## What is FlowPay?
 
-FlowPay allows you to create payment streams - continuous flows of tokens from sender to recipient. Instead of sending a lump sum, funds are gradually released based on elapsed time.
+FlowPay provides two ways to interact with payment streams:
 
-### Key Benefits
+1. **Web Dashboard** - For humans using MetaMask
+2. **TypeScript SDK** - For AI agents using private keys programmatically
 
-- **Flexible Payments** - Cancel anytime and get remaining funds back
-- **Real-time Streaming** - Funds accumulate every second
-- **No Intermediaries** - Direct blockchain transactions
-- **Full Control** - Withdraw accumulated funds whenever you want
+### Key Innovation: x402 Protocol
+
+FlowPay implements the x402 protocol for HTTP-based payment negotiation. AI agents can automatically:
+- Detect 402 Payment Required responses
+- Use Gemini AI to decide: stream or direct payment
+- Create streams and retry requests automatically
+- Reuse streams for subsequent requests (no new signatures!)
 
 ## How It Works
 
+### For Humans (Dashboard)
 | Step | Action |
 |------|--------|
 | 1 | Connect your MetaMask wallet |
 | 2 | Mint test MNEE tokens (testnet) |
 | 3 | Create a stream to any recipient |
 | 4 | Recipient withdraws funds as they accumulate |
+
+### For AI Agents (SDK)
+| Step | Action |
+|------|--------|
+| 1 | Initialize SDK with private key |
+| 2 | Make HTTP request to x402-protected API |
+| 3 | SDK auto-handles 402, creates stream |
+| 4 | Subsequent requests reuse stream (0 signatures!) |
 
 ## Current Deployment (Sepolia Testnet)
 
@@ -40,18 +53,12 @@ FlowPay allows you to create payment streams - continuous flows of tokens from s
 
 ## Features
 
-- ✅ **Web Dashboard** - Easy-to-use interface for all operations
+- ✅ **Web Dashboard** - Easy-to-use interface for humans
+- ✅ **TypeScript SDK** - Programmatic access for AI agents
+- ✅ **x402 Protocol** - Standard HTTP payment negotiation
+- ✅ **Gemini AI Integration** - Smart payment mode selection
 - ✅ **MNEE Token Streams** - Continuous payment flows  
-- ✅ **Real-time Monitoring** - Watch your streams progress live
-- ✅ **Withdraw Anytime** - Recipients can claim funds whenever
-- ✅ **Cancel Anytime** - Senders can stop streams and reclaim remaining funds
-
-## Getting Started
-
-1. **Connect Wallet** - Use MetaMask on Sepolia testnet
-2. **Get Test Tokens** - Mint free MNEE from the Streams tab
-3. **Create a Stream** - Send tokens to any address over time
-4. **Monitor Progress** - Watch real-time updates on the Dashboard
+- ✅ **Real-time Monitoring** - Watch streams progress live
 `
   },
   'quick-start': {
@@ -60,16 +67,18 @@ FlowPay allows you to create payment streams - continuous flows of tokens from s
     content: `
 # Quick Start
 
-Get FlowPay running in under 5 minutes using the dashboard.
+Get FlowPay running in under 5 minutes.
 
-## Step 1: Connect Your Wallet
+## For Humans (Dashboard)
+
+### Step 1: Connect Your Wallet
 
 1. Open the FlowPay dashboard at the home page
 2. Click **Connect Wallet** in the header
 3. Select MetaMask and approve the connection
 4. Ensure you're on **Sepolia testnet** (the app will prompt you to switch if needed)
 
-## Step 2: Get Test Tokens
+### Step 2: Get Test Tokens
 
 You need MNEE tokens to create streams:
 
@@ -78,9 +87,7 @@ You need MNEE tokens to create streams:
 3. Approve the transaction in MetaMask
 4. Wait for confirmation - your balance will update automatically
 
-## Step 3: Create Your First Stream
-
-All stream creation is done through the dashboard:
+### Step 3: Create Your First Stream
 
 1. Go to the **Streams** tab
 2. In the "Create New Stream" section, enter:
@@ -92,23 +99,63 @@ All stream creation is done through the dashboard:
 5. Approve the MNEE token allowance (first time only)
 6. Confirm the stream creation transaction
 
-## Step 4: Monitor Your Streams
+---
 
-Once your stream is active:
+## For AI Agents (SDK)
 
-- View real-time progress on the **Dashboard**
-- See all streams in the **Streams** tab
-- Track claimable balances for incoming streams
-- Cancel or withdraw from streams as needed
+### Step 1: Install the SDK
 
-## Step 5: Withdraw Funds (Recipients)
+\`\`\`bash
+cd sdk
+npm install
+\`\`\`
 
-If you're receiving a stream:
+### Step 2: Configure Environment
 
-1. Go to **Streams** tab
-2. Find your incoming stream
-3. Click **Withdraw** to claim accumulated funds
-4. Confirm the transaction
+Create a \`.env\` file with your agent's private key:
+
+\`\`\`bash
+PRIVATE_KEY_1=0x...your_private_key
+GEMINI_API_KEY=your_gemini_key  # Optional: for AI payment decisions
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+\`\`\`
+
+### Step 3: Initialize the SDK
+
+\`\`\`typescript
+import { FlowPaySDK } from './sdk/src/FlowPaySDK';
+import { ethers } from 'ethers';
+
+const sdk = new FlowPaySDK({
+    privateKey: process.env.PRIVATE_KEY_1,
+    rpcUrl: process.env.SEPOLIA_RPC_URL,
+    agentId: 'my-ai-agent',
+    spendingLimits: {
+        dailyLimit: ethers.parseEther("100"),
+        totalLimit: ethers.parseEther("1000")
+    }
+});
+\`\`\`
+
+### Step 4: Make x402 Requests
+
+\`\`\`typescript
+// SDK automatically handles 402 Payment Required
+const response = await sdk.makeRequest('https://api.example.com/premium');
+
+// First request: creates stream (1 blockchain tx)
+// Subsequent requests: reuses stream (0 blockchain txs!)
+\`\`\`
+
+### Step 5: Run the Demo
+
+\`\`\`bash
+# Terminal 1: Start the provider server
+npx ts-node demo/provider.ts
+
+# Terminal 2: Run the consumer agent
+npx ts-node demo/consumer.ts
+\`\`\`
 `
   },
   'installation': {
@@ -117,9 +164,7 @@ If you're receiving a stream:
     content: `
 # Installation
 
-FlowPay is a web-based application - no installation required for end users!
-
-## Using FlowPay (End Users)
+## For Humans (Dashboard)
 
 Simply visit the FlowPay dashboard and connect your wallet. No downloads or installations needed.
 
@@ -129,18 +174,46 @@ Simply visit the FlowPay dashboard and connect your wallet. No downloads or inst
 - **Sepolia ETH** for gas fees
 - **MNEE tokens** for creating streams (can be minted from the dashboard)
 
-## For Developers (Local Development)
+---
 
-If you want to run FlowPay locally or contribute to development:
+## For AI Agents (SDK)
 
-### Clone and Setup
+### Clone the Repository
 
 \`\`\`bash
 git clone https://github.com/your-org/flowpay
 cd flowpay
 \`\`\`
 
-### Install Dependencies
+### Install SDK Dependencies
+
+\`\`\`bash
+cd sdk
+npm install
+\`\`\`
+
+### Environment Variables
+
+Create a \`.env\` file in the project root:
+
+\`\`\`bash
+# Required: Agent wallet private key
+PRIVATE_KEY_1=0x...your_private_key
+
+# Optional: For AI-powered payment decisions
+GEMINI_API_KEY=your_gemini_api_key
+
+# Optional: Custom RPC endpoint
+SEPOLIA_RPC_URL=https://ethereum-sepolia-rpc.publicnode.com
+\`\`\`
+
+> ⚠️ **Security:** Never commit your private key to version control!
+
+---
+
+## For Developers (Full Stack)
+
+### Install All Dependencies
 
 \`\`\`bash
 # Root dependencies (smart contracts)
@@ -149,27 +222,33 @@ npm install
 # Frontend dependencies
 cd vite-project
 npm install
+
+# SDK dependencies
+cd ../sdk
+npm install
+
+# Server dependencies (x402 middleware)
+cd ../server
+npm install
 \`\`\`
 
-### Run Development Server
+### Run Development Servers
 
 \`\`\`bash
+# Frontend (Terminal 1)
 cd vite-project
 npm run dev
+
+# x402 Provider Server (Terminal 2)
+npx ts-node demo/provider.ts
 \`\`\`
 
-The app will be available at \`http://localhost:5173\`
+### Contract Addresses (Sepolia)
 
-## Environment Variables (Development Only)
-
-For local development, create a \`.env\` file in the root:
-
-\`\`\`bash
-PRIVATE_KEY=0x...  # For contract deployment only
-SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
-\`\`\`
-
-> ⚠️ **Note:** End users don't need any environment variables. All interactions happen through the web dashboard with MetaMask.
+| Contract | Address |
+|----------|---------|
+| MorphStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
+| MockMNEE | \`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896\` |
 `
   },
   'architecture': {
@@ -547,77 +626,152 @@ Check the official MNEE documentation for current acquisition methods.
 `
   },
   'sdk-reference': {
-    title: 'Dashboard Guide',
+    title: 'SDK Reference',
     icon: '🛠️',
     content: `
-# Dashboard Guide
+# SDK Reference
 
-Complete guide to using the FlowPay web dashboard.
+The FlowPaySDK enables AI agents to make payments programmatically using the x402 protocol.
 
-## Navigation
+## Installation
 
-The dashboard has four main sections accessible from the top navigation:
+\`\`\`bash
+cd sdk
+npm install
+\`\`\`
 
-| Tab | Purpose |
-|-----|---------|
-| **Dashboard** | Overview of your streams and activity |
-| **Streams** | Create and manage payment streams |
-| **Agent Console** | AI agent testing interface |
-| **Docs** | This documentation |
+## Initialization
 
-## Connecting Your Wallet
+\`\`\`typescript
+import { FlowPaySDK } from './sdk/src/FlowPaySDK';
+import { ethers } from 'ethers';
 
-1. Click **Connect Wallet** in the header
-2. MetaMask will prompt you to connect
-3. Approve the connection request
-4. If not on Sepolia, you'll be prompted to switch networks
+const sdk = new FlowPaySDK({
+    privateKey: process.env.PRIVATE_KEY_1,
+    rpcUrl: 'https://ethereum-sepolia-rpc.publicnode.com',
+    agentId: 'my-agent-id',  // Optional: identifies your agent
+    spendingLimits: {
+        dailyLimit: ethers.parseEther("100"),
+        totalLimit: ethers.parseEther("1000")
+    }
+});
+\`\`\`
 
-## Dashboard Tab
+## Core Methods
 
-The main dashboard shows:
+### makeRequest(url, options)
 
-- **Active Streams** - Count of your ongoing streams
-- **Stream Monitor** - Real-time visualization of stream progress
-- **Efficiency Metrics** - Usage statistics
+Makes an HTTP request with automatic x402 payment handling.
 
-## Streams Tab
+\`\`\`typescript
+const response = await sdk.makeRequest('https://api.example.com/premium', {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' }
+});
+\`\`\`
 
-### Creating a Stream
+**Flow:**
+1. Sends initial request
+2. If 402 received, reads payment requirements from headers
+3. AI brain decides: stream vs direct payment
+4. Creates payment stream on-chain
+5. Retries request with stream ID header
+6. Caches stream for subsequent requests
 
-1. Fill in the **Create New Stream** form:
-   - **Recipient**: Wallet address to receive payments
-   - **Token**: MNEE (currently the only supported token)
-   - **Amount**: Total MNEE to stream
-   - **Duration**: How long the stream should last
+### createStream(contractAddress, tokenAddress, amount, duration, metadata)
 
-2. Click **Start Stream**
-3. Approve token allowance (first time only)
-4. Confirm the transaction
+Manually create a payment stream.
 
-### Managing Streams
+\`\`\`typescript
+const stream = await sdk.createStream(
+    '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035',  // MorphStream
+    '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896',  // MockMNEE
+    ethers.parseEther("10"),  // 10 MNEE
+    3600,  // 1 hour
+    { type: 'manual', purpose: 'API access' }
+);
+console.log('Stream ID:', stream.streamId);
+\`\`\`
 
-**Outgoing Streams** (you're sending):
-- View progress and remaining time
-- Cancel to stop and reclaim remaining funds
+### getMetrics()
 
-**Incoming Streams** (you're receiving):
-- View claimable balance in real-time
-- Click **Withdraw** to claim accumulated funds
+Returns efficiency metrics.
 
-### Minting Test Tokens
+\`\`\`typescript
+const metrics = sdk.getMetrics();
+// { requestsSent: 10, signersTriggered: 1 }
+// 10 requests, only 1 blockchain transaction!
+\`\`\`
 
-Click **Mint 1000 MNEE** to get free test tokens on Sepolia.
+### emergencyStop() / resume()
 
-## Agent Console Tab
+Safety controls for spending.
 
-The Agent Console provides an AI-powered interface for testing x402 payment flows. This is primarily for demonstration and testing purposes.
+\`\`\`typescript
+sdk.emergencyStop();  // Pauses all payments
+sdk.resume();         // Resumes payments
+\`\`\`
 
-## Status Bar
+## AI Payment Brain
 
-The bottom status bar shows:
-- Current operation status
-- Transaction confirmations
-- Error messages
+The SDK includes Gemini AI integration for smart payment decisions.
+
+\`\`\`typescript
+// AI decides whether to stream or pay directly
+const mode = await sdk.selectPaymentMode(estimatedRequests);
+// Returns: 'stream' or 'direct'
+
+// Ask the AI agent questions
+const answer = await sdk.askAgent("Should I increase my spending limit?");
+\`\`\`
+
+## Spending Monitor
+
+Built-in spending limits protect against runaway costs.
+
+\`\`\`typescript
+const sdk = new FlowPaySDK({
+    // ...
+    spendingLimits: {
+        dailyLimit: ethers.parseEther("100"),   // Max 100 MNEE/day
+        totalLimit: ethers.parseEther("1000")   // Max 1000 MNEE total
+    }
+});
+
+// Check spending status
+const status = sdk.monitor.getStatus();
+// { dailySpent, totalSpent, dailyRemaining, totalRemaining }
+\`\`\`
+
+## x402 Headers
+
+### Request Headers (sent by SDK)
+
+| Header | Description |
+|--------|-------------|
+| \`X-FlowPay-Stream-ID\` | Active stream ID for payment |
+| \`X-FlowPay-Tx-Hash\` | Transaction hash for direct payments |
+
+### Response Headers (from 402)
+
+| Header | Description |
+|--------|-------------|
+| \`X-Payment-Required\` | Indicates payment needed |
+| \`X-FlowPay-Rate\` | MNEE per second/request |
+| \`X-FlowPay-Contract\` | MorphStream contract address |
+| \`X-MNEE-Address\` | MNEE token address |
+
+## Demo Scripts
+
+Run the full demo to see the SDK in action:
+
+\`\`\`bash
+# Terminal 1: Start provider
+npx ts-node demo/provider.ts
+
+# Terminal 2: Run consumer
+npx ts-node demo/consumer.ts
+\`\`\`
 `
   },
   'deployment': {
@@ -701,7 +855,12 @@ FlowPay enables flexible, time-based payments where funds are released gradually
 Currently Ethereum Sepolia testnet only. Mainnet deployment is planned for the future.
 
 ### Is there an SDK or API?
-No, FlowPay is currently a frontend-only application. All interactions are done through the web dashboard using MetaMask.
+Yes! FlowPay provides:
+- **Web Dashboard** - For humans using MetaMask
+- **TypeScript SDK** - For AI agents using private keys programmatically
+- **x402 Middleware** - For providers to monetize APIs
+
+The SDK handles automatic x402 payment negotiation, stream creation, and stream reuse.
 
 ## Technical
 
@@ -790,7 +949,7 @@ const sidebarNav = [
   {
     title: 'Reference',
     items: [
-      { id: 'sdk-reference', title: 'Dashboard Guide' },
+      { id: 'sdk-reference', title: 'SDK Reference' },
       { id: 'deployment', title: 'Deployment' },
       { id: 'faq', title: 'FAQ' },
     ]

@@ -13,9 +13,18 @@ FlowPay combines **x402's HTTP-native service discovery** with **continuous paym
 
 ## 📺 Live Demo & Video
 
-* **Live dApp:** `[Link to deployment]`
-* **Demo Video:** `[Link to demo video]`
-* **MNEE Contract:** `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`
+| Resource | Link |
+|----------|------|
+| **Live dApp** | https://flowpay-dashboard.netlify.app |
+| **Demo Video** | `[Add your demo video link here]` |
+| **GitHub Repo** | https://github.com/ola-893/flowpay |
+| **MNEE Contract (Mainnet)** | `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF` |
+
+### Test Credentials
+No login required! Simply:
+1. Connect MetaMask wallet to Sepolia testnet
+2. Mint free test MNEE tokens from the dashboard
+3. Create streams and test the full flow
 
 ---
 
@@ -310,8 +319,8 @@ Consumer Agent                Provider API                FlowPay Contract
 ### 1. Clone & Install
 
 ```bash
-git clone [Your GitHub Repo URL]
-cd FlowPay
+git clone https://github.com/ola-893/flowpay.git
+cd flowpay
 
 # Install root dependencies
 npm install
@@ -337,7 +346,16 @@ MNEE_CONTRACT="0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF"
 GEMINI_API_KEY="your_gemini_api_key"
 ```
 
-### 3. Deploy Contracts
+### 3. Deployed Contracts (Sepolia Testnet)
+
+The contracts are already deployed on Sepolia:
+
+| Contract | Address |
+|----------|---------|
+| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
+
+To deploy your own:
 
 ```bash
 # Deploy FlowPay contract to Sepolia
@@ -350,7 +368,39 @@ The project uses a `MockMNEE` ERC-20 token for testnet development. When deployi
 
 **MNEE Mainnet Contract:** `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`
 
-1. **Update the deployment script** (`scripts/deploy.js`):
+#### Key Differences
+
+| Feature | MockMNEE (Testnet) | MNEE (Mainnet) |
+|---------|-------------------|----------------|
+| Free minting | ✅ Yes | ❌ No |
+| Real value | ❌ No | ✅ Yes |
+| Gas costs | Free (testnet ETH) | Real ETH required |
+| Network | Sepolia | Ethereum Mainnet |
+
+#### Migration Steps
+
+1. **Update the frontend token address** (`vite-project/src/contactInfo.js`):
+   ```javascript
+   // Change from testnet MockMNEE
+   export const mneeTokenAddress = '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896';
+
+   // To mainnet MNEE
+   export const mneeTokenAddress = '0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF';
+   ```
+
+2. **Update the network configuration** to target Ethereum Mainnet (Chain ID: 1) instead of Sepolia (Chain ID: 11155111)
+
+3. **Deploy MorphStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
+
+4. **Remove the Mint button** - Real MNEE cannot be freely minted like the test token. Update the UI to hide/remove the mint functionality.
+
+5. **Update environment variables** (`.env`):
+   ```env
+   # Use mainnet MNEE instead of mock
+   MNEE_CONTRACT=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
+   ```
+
+6. **Update the deployment script** (`scripts/deploy.js`):
    ```javascript
    // Replace MockMNEE deployment with mainnet address
    const MNEE_MAINNET = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
@@ -359,24 +409,16 @@ The project uses a `MockMNEE` ERC-20 token for testnet development. When deployi
    const morphStream = await MorphStream.deploy(MNEE_MAINNET);
    ```
 
-2. **Update environment variables** (`.env`):
-   ```env
-   # Use mainnet MNEE instead of mock
-   MNEE_CONTRACT=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
-   ```
+#### Acquiring Real MNEE
 
-3. **Update frontend configuration** (`vite-project/src/contractInfo.js`):
-   ```javascript
-   export const mneeAddress = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
-   ```
+On mainnet, you'll need to acquire MNEE tokens through:
+- Supported exchanges
+- Token swaps (Uniswap, etc.)
+- Direct purchase
 
-4. **Update SDK/server configuration** if applicable:
-   ```javascript
-   // In any config files referencing MNEE
-   const MNEE_ADDRESS = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
-   ```
+Check the official MNEE documentation for current acquisition methods.
 
-> **Note:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `MorphStream.sol` — it already uses the `IERC20` interface. The only difference is MockMNEE has a public `mint()` function for testing, which mainnet MNEE does not have (you'll need to acquire real MNEE tokens).
+> **⚠️ Important:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `MorphStream.sol` — it already uses the `IERC20` interface. Always test thoroughly on Sepolia before deploying to mainnet. Mainnet transactions use real funds and cannot be reversed.
 
 ### 4. Configure Frontend
 
@@ -510,24 +552,35 @@ console.log(response);
 ## 📁 Project Structure
 
 ```
-FlowPay/
+flowpay/
 ├── contracts/
-│   └── FlowPayStream.sol      # MNEE streaming contract
+│   ├── MorphStream.sol        # MNEE streaming contract
+│   └── MockMNEE.sol           # Test token for Sepolia
 ├── scripts/
 │   └── deploy.js              # Deployment script
 ├── sdk/
-│   ├── agent.ts               # Agent SDK
-│   └── gemini.ts              # AI integration
+│   └── src/
+│       ├── FlowPaySDK.ts      # Agent SDK with x402 handling
+│       ├── GeminiPaymentBrain.ts  # AI payment decisions
+│       └── SpendingMonitor.ts # Budget management
+├── server/
+│   └── middleware/
+│       └── flowPayMiddleware.js  # x402 Express middleware
+├── demo/
+│   ├── consumer.ts            # AI agent demo (consumer)
+│   └── provider.ts            # API provider demo
 ├── vite-project/
 │   ├── src/
 │   │   ├── components/        # React components
-│   │   ├── App.jsx            # Main application
-│   │   └── contractInfo.js    # Contract configuration
-│   └── package.json
+│   │   ├── pages/             # Dashboard, Streams, Docs
+│   │   ├── context/           # Wallet context
+│   │   └── contactInfo.js     # Contract addresses
+│   └── netlify.toml           # Deployment config
 ├── test/
-│   └── FlowPay.test.js        # Contract tests
+│   └── MorphStream.test.js    # Contract tests
 ├── hardhat.config.js
 ├── package.json
+├── LICENSE                    # MIT License
 └── README.md
 ```
 
@@ -536,6 +589,14 @@ FlowPay/
 ## 🏆 Hackathon Track
 
 **AI & Agent Payments** - Agents or automated systems paying for services or data
+
+### How MNEE is Used
+
+FlowPay uses MNEE stablecoin as the payment token for all streaming payments:
+- **Payment Streams**: MNEE tokens are locked in the MorphStream smart contract and streamed per-second to recipients
+- **x402 Protocol**: AI agents pay for API access using MNEE via the x402 HTTP payment negotiation standard
+- **Testnet**: Uses MockMNEE (`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896`) on Sepolia
+- **Mainnet Ready**: Designed to work with real MNEE (`0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`) on Ethereum mainnet
 
 FlowPay demonstrates:
 - ✅ x402-compatible service discovery (HTTP 402 standard)
@@ -552,6 +613,22 @@ FlowPay demonstrates:
 3. **AI-Powered** - Gemini automatically optimizes payment mode
 4. **MNEE Native** - Built specifically for MNEE stablecoin
 5. **Production Ready** - Express middleware for easy integration
+
+---
+
+## 📋 Third-Party Disclosures
+
+| Dependency | Purpose | License |
+|------------|---------|---------|
+| [Ethers.js](https://docs.ethers.org/) | Blockchain interaction | MIT |
+| [React](https://react.dev/) | Frontend framework | MIT |
+| [Vite](https://vitejs.dev/) | Build tool | MIT |
+| [Tailwind CSS](https://tailwindcss.com/) | Styling | MIT |
+| [Hardhat](https://hardhat.org/) | Smart contract development | MIT |
+| [Google Gemini API](https://ai.google.dev/) | AI payment decisions | Google API Terms |
+| [Axios](https://axios-http.com/) | HTTP client | MIT |
+
+All third-party dependencies are used in accordance with their respective licenses.
 
 ---
 
