@@ -3,6 +3,7 @@ import { useWallet } from '../context/WalletContext';
 import { AgentConsole } from '../components/AgentConsole';
 import { DecisionLog } from '../components/DecisionLog';
 import { ErrorBoundary, SkeletonAgentConsole } from '../components/ui';
+import { Bot, Play, Pause, RefreshCw, BarChart3, StopCircle, Settings } from 'lucide-react';
 
 export default function AgentConsolePage() {
   const { walletAddress, isInitialLoad } = useWallet();
@@ -39,7 +40,7 @@ export default function AgentConsolePage() {
   if (!walletAddress) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="text-6xl mb-4">🤖</div>
+        <Bot className="w-16 h-16 text-white/60 mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
         <p className="text-white/60 text-center max-w-md">
           Connect your wallet to configure and monitor your AI payment agent.
@@ -76,19 +77,27 @@ export default function AgentConsolePage() {
           onClick={() => setIsPaused(!isPaused)}
           className={`card-glass p-4 text-center hover:bg-white/5 transition-colors ${isPaused ? 'border-amber-500/30' : ''}`}
         >
-          <div className="text-2xl mb-2">{isPaused ? '▶️' : '⏸️'}</div>
+          <div className="flex justify-center mb-2">
+            {isPaused ? <Play className="w-6 h-6 text-white/80" /> : <Pause className="w-6 h-6 text-white/80" />}
+          </div>
           <div className="text-sm text-white/80">{isPaused ? 'Resume' : 'Pause'} Agent</div>
         </button>
         <button className="card-glass p-4 text-center hover:bg-white/5 transition-colors">
-          <div className="text-2xl mb-2">🔄</div>
+          <div className="flex justify-center mb-2">
+            <RefreshCw className="w-6 h-6 text-white/80" />
+          </div>
           <div className="text-sm text-white/80">Refresh Status</div>
         </button>
         <button className="card-glass p-4 text-center hover:bg-white/5 transition-colors">
-          <div className="text-2xl mb-2">📊</div>
+          <div className="flex justify-center mb-2">
+            <BarChart3 className="w-6 h-6 text-white/80" />
+          </div>
           <div className="text-sm text-white/80">View Metrics</div>
         </button>
         <button className="card-glass p-4 text-center hover:bg-white/5 transition-colors border-red-500/30">
-          <div className="text-2xl mb-2">🛑</div>
+          <div className="flex justify-center mb-2">
+            <StopCircle className="w-6 h-6 text-red-400" />
+          </div>
           <div className="text-sm text-white/80">Emergency Stop</div>
         </button>
       </div>
@@ -108,7 +117,9 @@ export default function AgentConsolePage() {
 
       {/* Agent Configuration Summary */}
       <div className="card-glass p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">⚙️ Configuration Summary</h3>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Settings className="w-5 h-5" /> Configuration Summary
+        </h3>
         <div className="grid md:grid-cols-2 gap-6">
           <div>
             <h4 className="text-sm font-medium text-white/60 mb-2">Spending Limits</h4>

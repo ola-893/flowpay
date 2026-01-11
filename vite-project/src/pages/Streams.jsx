@@ -4,6 +4,7 @@ import { mneeTokenAddress } from '../contactInfo';
 import CreateStreamForm from '../components/CreateStreamForm';
 import StreamList from '../components/StreamList';
 import { CollapsibleSection, SkeletonStreamCard } from '../components/ui';
+import { ArrowRightLeft, Coins, Plus, Wallet } from 'lucide-react';
 
 export default function Streams() {
   const {
@@ -76,7 +77,7 @@ export default function Streams() {
   if (!walletAddress) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="text-6xl mb-4">💸</div>
+        <ArrowRightLeft className="w-16 h-16 text-white/60 mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
         <p className="text-white/60 text-center max-w-md">
           Connect your wallet to create and manage payment streams.
@@ -99,7 +100,9 @@ export default function Streams() {
       <section className="card-glass p-4 md:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-white mb-1">💰 MNEE Token Balance</h3>
+            <h3 className="text-lg font-semibold text-white mb-1 flex items-center gap-2">
+              <Coins className="w-5 h-5" /> MNEE Token Balance
+            </h3>
             <p className="text-2xl font-mono text-cyan-300">
               {Number(mneeBalance).toLocaleString(undefined, { maximumFractionDigits: 4 })} MNEE
             </p>
@@ -129,7 +132,7 @@ export default function Streams() {
       </section>
 
       <section className="grid gap-4 md:gap-6 lg:grid-cols-2">
-        <CollapsibleSection title="Create Stream" icon="➕" defaultOpen={true}>
+        <CollapsibleSection title="Create Stream" icon={<Plus className="w-5 h-5" />} defaultOpen={true}>
           <p className="text-sm text-white/50 mb-4">
             Funds stream per second using MNEE tokens. Flow rate = total / duration.
           </p>
@@ -144,7 +147,7 @@ export default function Streams() {
           />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Withdraw Funds" icon="💰" defaultOpen={true}>
+        <CollapsibleSection title="Withdraw Funds" icon={<Wallet className="w-5 h-5" />} defaultOpen={true}>
           <p className="text-sm text-white/60 mb-4">
             Enter a stream ID to check and withdraw claimable MNEE funds.
           </p>

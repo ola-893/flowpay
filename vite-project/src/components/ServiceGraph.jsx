@@ -1,12 +1,13 @@
 import React, { useState, useRef, useCallback, useMemo } from 'react';
+import { User, Bot, Wrench, Database, Globe, Plus } from 'lucide-react';
 
 // Initial node positions
 const INITIAL_NODES = [
-    { id: 'client', label: 'Client', icon: '👤', type: 'client', x: 80, y: 200, color: 'flowpay' },
-    { id: 'agent-a', label: 'Agent A', icon: '🤖', type: 'agent', x: 280, y: 120, color: 'accent', margin: 10 },
-    { id: 'agent-b', label: 'Agent B', icon: '🤖', type: 'agent', x: 280, y: 280, color: 'accent', margin: 5 },
-    { id: 'service-a', label: 'API Service', icon: '🛠️', type: 'service', x: 480, y: 120, color: 'success' },
-    { id: 'service-b', label: 'Data Service', icon: '💾', type: 'service', x: 480, y: 280, color: 'success' },
+    { id: 'client', label: 'Client', Icon: User, type: 'client', x: 80, y: 200, color: 'flowpay' },
+    { id: 'agent-a', label: 'Agent A', Icon: Bot, type: 'agent', x: 280, y: 120, color: 'accent', margin: 10 },
+    { id: 'agent-b', label: 'Agent B', Icon: Bot, type: 'agent', x: 280, y: 280, color: 'accent', margin: 5 },
+    { id: 'service-a', label: 'API Service', Icon: Wrench, type: 'service', x: 480, y: 120, color: 'success' },
+    { id: 'service-b', label: 'Data Service', Icon: Database, type: 'service', x: 480, y: 280, color: 'success' },
 ];
 
 const INITIAL_EDGES = [
@@ -23,6 +24,8 @@ const GraphNode = ({ node, isSelected, onSelect, onDragStart, isDragging }) => {
         accent: 'from-accent-500 to-accent-600 border-accent-400 shadow-glow-accent',
         success: 'from-success-500 to-success-600 border-success-400 shadow-glow-success',
     };
+
+    const NodeIcon = node.Icon;
 
     return (
         <g
@@ -50,8 +53,12 @@ const GraphNode = ({ node, isSelected, onSelect, onDragStart, isDragging }) => {
                 strokeWidth="2"
             />
 
-            {/* Icon */}
-            <text textAnchor="middle" dy="8" fontSize="20">{node.icon}</text>
+            {/* Icon - using foreignObject for React components */}
+            <foreignObject x="-10" y="-10" width="20" height="20">
+                <div className="flex items-center justify-center w-full h-full">
+                    <NodeIcon className="w-5 h-5 text-white" />
+                </div>
+            </foreignObject>
 
             {/* Label */}
             <text textAnchor="middle" dy="50" fill="white" fontSize="12" fontWeight="600">
@@ -133,11 +140,13 @@ const GraphEdge = ({ edge, sourceNode, targetNode }) => {
 const NodeDetails = ({ node, onClose, onMarginChange }) => {
     if (!node) return null;
 
+    const NodeIcon = node.Icon;
+
     return (
         <div className="absolute top-4 right-4 w-64 glass rounded-xl p-4 animate-slide-down z-20">
             <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                    <span className="text-2xl">{node.icon}</span>
+                    <NodeIcon className="w-6 h-6 text-white/80" />
                     <span className="font-semibold text-white">{node.label}</span>
                 </div>
                 <button onClick={onClose} className="text-white/40 hover:text-white">✕</button>
@@ -317,11 +326,11 @@ export function ServiceGraph() {
         <div className="card-glass p-6 h-full relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    🌐 Service Mesh Topology
+                    <Globe className="w-5 h-5" /> Service Mesh Topology
                     <span className="chip-primary">{edges.length} streams</span>
                 </h2>
-                <button onClick={() => setShowAddModal(true)} className="btn-outline text-sm">
-                    ➕ Add Connection
+                <button onClick={() => setShowAddModal(true)} className="btn-outline text-sm flex items-center gap-1">
+                    <Plus className="w-4 h-4" /> Add Connection
                 </button>
             </div>
 

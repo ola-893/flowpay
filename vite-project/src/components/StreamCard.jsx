@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { CheckCircle, AlertTriangle, XCircle, Coins } from 'lucide-react';
 
 // Animated Counter for real-time balance
 const AnimatedBalance = ({ value, decimals = 6 }) => {
@@ -83,17 +84,18 @@ const ProgressRing = ({ progress, size = 80, strokeWidth = 6, status = 'active' 
 // Status Badge
 const StatusBadge = ({ status }) => {
   const badges = {
-    active: { label: 'Active', icon: '●', class: 'chip-success' },
-    low: { label: 'Low Balance', icon: '⚠', class: 'chip-warning' },
-    expired: { label: 'Completed', icon: '✓', class: 'chip' },
-    cancelled: { label: 'Cancelled', icon: '✗', class: 'chip-error' },
+    active: { label: 'Active', Icon: CheckCircle, class: 'chip-success', animate: true },
+    low: { label: 'Low Balance', Icon: AlertTriangle, class: 'chip-warning', animate: false },
+    expired: { label: 'Completed', Icon: CheckCircle, class: 'chip', animate: false },
+    cancelled: { label: 'Cancelled', Icon: XCircle, class: 'chip-error', animate: false },
   };
 
   const badge = badges[status] || badges.active;
+  const IconComponent = badge.Icon;
 
   return (
     <span className={`${badge.class} flex items-center gap-1`}>
-      <span className={status === 'active' ? 'animate-pulse' : ''}>{badge.icon}</span>
+      <IconComponent className={`w-3 h-3 ${badge.animate ? 'animate-pulse' : ''}`} />
       {badge.label}
     </span>
   );
@@ -200,11 +202,11 @@ export default function StreamCard({ stream, variant, formatEth, onWithdraw, onC
 
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-xl font-bold text-white">{formatEth(stream.totalAmount)}</span>
-              <span className="text-sm text-white/50">ETH</span>
+              <span className="text-sm text-white/50">MNEE</span>
             </div>
 
             <div className="text-xs font-mono text-white/50">
-              Rate: {formatEth(stream.flowRate)} ETH/sec
+              Rate: {formatEth(stream.flowRate)} MNEE/sec
             </div>
           </div>
 
@@ -215,7 +217,7 @@ export default function StreamCard({ stream, variant, formatEth, onWithdraw, onC
               <div className="text-lg font-bold text-success-400">
                 <AnimatedBalance value={liveClaimable} />
               </div>
-              <div className="text-xs text-white/50">ETH</div>
+              <div className="text-xs text-white/50">MNEE</div>
             </div>
           )}
         </div>
@@ -232,10 +234,10 @@ export default function StreamCard({ stream, variant, formatEth, onWithdraw, onC
           <div className="flex gap-2">
             {variant === 'incoming' && status === 'active' && (
               <button
-                className="btn-success text-sm px-3 py-1.5"
+                className="btn-success text-sm px-3 py-1.5 flex items-center gap-1"
                 onClick={() => handleAction('withdraw')}
               >
-                💰 Withdraw
+                <Coins className="w-4 h-4" /> Withdraw
               </button>
             )}
             {status === 'active' && (

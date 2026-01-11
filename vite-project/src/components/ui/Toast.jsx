@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { CheckCircle, XCircle, AlertTriangle, Info, Loader2 } from 'lucide-react';
 
 // Toast Context
 const ToastContext = createContext(null);
@@ -6,33 +7,33 @@ const ToastContext = createContext(null);
 // Toast Types Configuration
 const toastConfig = {
   success: {
-    icon: '✓',
+    Icon: CheckCircle,
     bgClass: 'bg-success-500/10 border-success-500/30',
-    iconClass: 'bg-success-500 text-white',
+    iconClass: 'text-success-500',
     textClass: 'text-success-400',
   },
   error: {
-    icon: '✕',
+    Icon: XCircle,
     bgClass: 'bg-error-500/10 border-error-500/30',
-    iconClass: 'bg-error-500 text-white',
+    iconClass: 'text-error-500',
     textClass: 'text-error-400',
   },
   warning: {
-    icon: '!',
+    Icon: AlertTriangle,
     bgClass: 'bg-warning-500/10 border-warning-500/30',
-    iconClass: 'bg-warning-500 text-white',
+    iconClass: 'text-warning-500',
     textClass: 'text-warning-400',
   },
   info: {
-    icon: 'i',
+    Icon: Info,
     bgClass: 'bg-flowpay-500/10 border-flowpay-500/30',
-    iconClass: 'bg-flowpay-500 text-white',
+    iconClass: 'text-flowpay-500',
     textClass: 'text-flowpay-400',
   },
   loading: {
-    icon: '⟳',
+    Icon: Loader2,
     bgClass: 'bg-white/5 border-white/20',
-    iconClass: 'bg-white/20 text-white animate-spin',
+    iconClass: 'text-white/60 animate-spin',
     textClass: 'text-white/80',
   },
 };
@@ -41,6 +42,7 @@ const toastConfig = {
 function Toast({ id, type = 'info', title, message, duration = 5000, onDismiss, action }) {
   const [isExiting, setIsExiting] = useState(false);
   const config = toastConfig[type] || toastConfig.info;
+  const IconComponent = config.Icon;
 
   const handleDismiss = useCallback(() => {
     setIsExiting(true);
@@ -68,8 +70,8 @@ function Toast({ id, type = 'info', title, message, duration = 5000, onDismiss, 
       role="alert"
     >
       {/* Icon */}
-      <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${config.iconClass}`}>
-        {config.icon}
+      <div className={`flex-shrink-0 ${config.iconClass}`}>
+        <IconComponent className="w-5 h-5" />
       </div>
 
       {/* Content */}

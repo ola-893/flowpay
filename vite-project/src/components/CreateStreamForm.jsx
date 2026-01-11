@@ -1,17 +1,17 @@
 import { useState, useMemo } from 'react';
+import { Clock, Calendar, CalendarDays, Settings, Hexagon, Coins, Search, Rocket } from 'lucide-react';
 
 // Duration presets in seconds
 const DURATION_PRESETS = [
-  { label: '1 Hour', value: 3600, icon: '⏰' },
-  { label: '24 Hours', value: 86400, icon: '📅' },
-  { label: '7 Days', value: 604800, icon: '📆' },
-  { label: 'Custom', value: null, icon: '⚙️' },
+  { label: '1 Hour', value: 3600, Icon: Clock },
+  { label: '24 Hours', value: 86400, Icon: Calendar },
+  { label: '7 Days', value: 604800, Icon: CalendarDays },
+  { label: 'Custom', value: null, Icon: Settings },
 ];
 
 // Token options
 const TOKENS = [
-  { symbol: 'ETH', name: 'Ethereum', icon: '⟠', balance: '1.234' },
-  { symbol: 'MNEE', name: 'MNEE Token', icon: '💰', balance: '500.00' },
+  { symbol: 'MNEE', name: 'MNEE Token', Icon: Coins, balance: '500.00' },
 ];
 
 // Progress Step Component
@@ -67,7 +67,7 @@ const RecipientInput = ({ value, onChange, isValid }) => {
       </div>
       {value.endsWith('.eth') && (
         <div className="text-xs text-accent-400 flex items-center gap-1">
-          <span className="animate-pulse">🔍</span> Resolving ENS...
+          <Search className="w-3 h-3 animate-pulse" /> Resolving ENS...
         </div>
       )}
     </div>
@@ -79,30 +79,33 @@ const TokenSelector = ({ selected, onSelect }) => (
   <div className="space-y-2">
     <label className="text-sm font-medium text-white/80">Select Token</label>
     <div className="grid grid-cols-2 gap-3">
-      {TOKENS.map(token => (
-        <button
-          key={token.symbol}
-          type="button"
-          onClick={() => onSelect(token)}
-          className={`
-            p-4 rounded-xl border transition-all text-left
-            ${selected?.symbol === token.symbol
-              ? 'border-flowpay-500 bg-flowpay-500/10 shadow-border-glow'
-              : 'border-white/10 bg-white/5 hover:bg-white/10'}
-          `}
-        >
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">{token.icon}</span>
-            <div>
-              <div className="font-semibold text-white">{token.symbol}</div>
-              <div className="text-xs text-white/50">{token.name}</div>
+      {TOKENS.map(token => {
+        const TokenIcon = token.Icon;
+        return (
+          <button
+            key={token.symbol}
+            type="button"
+            onClick={() => onSelect(token)}
+            className={`
+              p-4 rounded-xl border transition-all text-left
+              ${selected?.symbol === token.symbol
+                ? 'border-flowpay-500 bg-flowpay-500/10 shadow-border-glow'
+                : 'border-white/10 bg-white/5 hover:bg-white/10'}
+            `}
+          >
+            <div className="flex items-center gap-2">
+              <TokenIcon className="w-6 h-6 text-white/80" />
+              <div>
+                <div className="font-semibold text-white">{token.symbol}</div>
+                <div className="text-xs text-white/50">{token.name}</div>
+              </div>
             </div>
-          </div>
-          <div className="mt-2 text-xs text-white/60">
-            Balance: <span className="font-mono text-white/80">{token.balance}</span>
-          </div>
-        </button>
-      ))}
+            <div className="mt-2 text-xs text-white/60">
+              Balance: <span className="font-mono text-white/80">{token.balance}</span>
+            </div>
+          </button>
+        );
+      })}
     </div>
   </div>
 );
@@ -112,22 +115,27 @@ const DurationSelector = ({ selected, onSelect, customValue, onCustomChange }) =
   <div className="space-y-2">
     <label className="text-sm font-medium text-white/80">Stream Duration</label>
     <div className="grid grid-cols-4 gap-2">
-      {DURATION_PRESETS.map(preset => (
-        <button
-          key={preset.label}
-          type="button"
-          onClick={() => onSelect(preset)}
-          className={`
-            p-3 rounded-lg border text-center transition-all
-            ${selected?.label === preset.label
-              ? 'border-flowpay-500 bg-flowpay-500/10'
-              : 'border-white/10 bg-white/5 hover:bg-white/10'}
-          `}
-        >
-          <div className="text-lg">{preset.icon}</div>
-          <div className="text-xs text-white/70 mt-1">{preset.label}</div>
-        </button>
-      ))}
+      {DURATION_PRESETS.map(preset => {
+        const PresetIcon = preset.Icon;
+        return (
+          <button
+            key={preset.label}
+            type="button"
+            onClick={() => onSelect(preset)}
+            className={`
+              p-3 rounded-lg border text-center transition-all
+              ${selected?.label === preset.label
+                ? 'border-flowpay-500 bg-flowpay-500/10'
+                : 'border-white/10 bg-white/5 hover:bg-white/10'}
+            `}
+          >
+            <div className="flex justify-center">
+              <PresetIcon className="w-5 h-5 text-white/70" />
+            </div>
+            <div className="text-xs text-white/70 mt-1">{preset.label}</div>
+          </button>
+        );
+      })}
     </div>
     {selected?.value === null && (
       <input
@@ -160,19 +168,19 @@ const RateCalculator = ({ amount, duration, token }) => {
         <div>
           <div className="text-white/50">Flow Rate</div>
           <div className="font-mono font-semibold text-flowpay-300">
-            {rate.toFixed(8)} {token?.symbol || 'ETH'}/sec
+            {rate.toFixed(8)} {token?.symbol || 'MNEE'}/sec
           </div>
         </div>
         <div>
           <div className="text-white/50">Per Hour</div>
           <div className="font-mono font-semibold text-white">
-            {ratePerHour.toFixed(6)} {token?.symbol || 'ETH'}
+            {ratePerHour.toFixed(6)} {token?.symbol || 'MNEE'}
           </div>
         </div>
         <div>
           <div className="text-white/50">Per Day</div>
           <div className="font-mono font-semibold text-white">
-            {ratePerDay.toFixed(4)} {token?.symbol || 'ETH'}
+            {ratePerDay.toFixed(4)} {token?.symbol || 'MNEE'}
           </div>
         </div>
         <div>
@@ -337,7 +345,7 @@ export default function CreateStreamForm({
             className={`flex-1 ${currentStep === 3 ? 'btn-primary' : 'btn-default'}`}
             disabled={!canProceed[currentStep]}
           >
-            {currentStep === 3 ? '🚀 Start Stream' : 'Continue →'}
+            {currentStep === 3 ? <><Rocket className="w-4 h-4" /> Start Stream</> : 'Continue →'}
           </button>
         </div>
       </form>

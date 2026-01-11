@@ -1,14 +1,24 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { 
+  LayoutDashboard, 
+  ArrowRightLeft, 
+  Bot, 
+  BookOpen, 
+  Link as LinkIcon,
+  Hexagon,
+  Wrench,
+  Lock,
+  Download,
+  LogOut
+} from 'lucide-react';
 
-// Chain icons (simplified inline SVGs)
+// Chain icons using Lucide
 const ChainIcon = ({ chainId }) => {
-  const icons = {
-    11155111: '⟠', // Sepolia (Ethereum)
-    1: '⟠',       // Mainnet
-    default: '🔗'
-  };
-  return <span className="text-sm">{icons[chainId] || icons.default}</span>;
+  const isEthereum = chainId === 11155111 || chainId === 1;
+  return isEthereum 
+    ? <Hexagon className="w-4 h-4 text-white/70" />
+    : <LinkIcon className="w-4 h-4 text-white/70" />;
 };
 
 // Animated FlowPay Logo with streaming effect
@@ -23,7 +33,7 @@ const AnimatedLogo = () => (
 );
 
 // Navigation Tab Component with Link
-const NavTab = ({ icon, label, active, to }) => (
+const NavTab = ({ icon: Icon, label, active, to }) => (
   <Link
     to={to}
     className={`
@@ -35,7 +45,7 @@ const NavTab = ({ icon, label, active, to }) => (
       }
     `}
   >
-    <span>{icon}</span>
+    <Icon className="w-5 h-5" />
     <span className="hidden sm:inline">{label}</span>
     {active && <div className="w-1.5 h-1.5 rounded-full bg-flowpay-400 animate-pulse" />}
   </Link>
@@ -99,17 +109,17 @@ const SettingsDropdown = () => {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 glass rounded-xl overflow-hidden shadow-glass animate-fade-in z-50">
           <button className="w-full px-4 py-2.5 text-left text-sm text-white/80 hover:bg-white/10 flex items-center gap-2">
-            <span>🔧</span> Preferences
+            <Wrench className="w-4 h-4" /> Preferences
           </button>
           <button className="w-full px-4 py-2.5 text-left text-sm text-white/80 hover:bg-white/10 flex items-center gap-2">
-            <span>🔐</span> Security
+            <Lock className="w-4 h-4" /> Security
           </button>
           <button className="w-full px-4 py-2.5 text-left text-sm text-white/80 hover:bg-white/10 flex items-center gap-2">
-            <span>📊</span> Export Data
+            <Download className="w-4 h-4" /> Export Data
           </button>
           <div className="border-t border-white/10" />
           <button className="w-full px-4 py-2.5 text-left text-sm text-error-400 hover:bg-error-500/10 flex items-center gap-2">
-            <span>🚪</span> Disconnect
+            <LogOut className="w-4 h-4" /> Disconnect
           </button>
         </div>
       )}
@@ -124,33 +134,36 @@ const MobileMenu = ({ isOpen, activeTab, tabs }) => {
   return (
     <div className="md:hidden absolute top-full left-0 right-0 mt-2 mx-4 glass rounded-xl p-4 animate-slide-down z-50">
       <nav className="flex flex-col gap-2">
-        {tabs.map(tab => (
-          <Link
-            key={tab.id}
-            to={tab.path}
-            className={`
-              w-full px-4 py-3 rounded-lg text-left text-sm font-medium transition-all
-              flex items-center gap-3
-              ${activeTab === tab.id
-                ? 'bg-flowpay-500/20 text-flowpay-300'
-                : 'text-white/60 hover:bg-white/5'
-              }
-            `}
-          >
-            <span className="text-lg">{tab.icon}</span>
-            <span>{tab.label}</span>
-          </Link>
-        ))}
+        {tabs.map(tab => {
+          const Icon = tab.icon;
+          return (
+            <Link
+              key={tab.id}
+              to={tab.path}
+              className={`
+                w-full px-4 py-3 rounded-lg text-left text-sm font-medium transition-all
+                flex items-center gap-3
+                ${activeTab === tab.id
+                  ? 'bg-flowpay-500/20 text-flowpay-300'
+                  : 'text-white/60 hover:bg-white/5'
+                }
+              `}
+            >
+              <Icon className="w-5 h-5" />
+              <span>{tab.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );
 };
 
 const defaultTabs = [
-  { id: 'dashboard', path: '/', icon: '📊', label: 'Dashboard' },
-  { id: 'streams', path: '/streams', icon: '💸', label: 'Streams' },
-  { id: 'agent', path: '/agent', icon: '🤖', label: 'Agent Console' },
-  { id: 'docs', path: '/docs', icon: '📚', label: 'Docs' },
+  { id: 'dashboard', path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { id: 'streams', path: '/streams', icon: ArrowRightLeft, label: 'Streams' },
+  { id: 'agent', path: '/agent', icon: Bot, label: 'Agent Console' },
+  { id: 'docs', path: '/docs', icon: BookOpen, label: 'Docs' },
 ];
 
 export default function Header({
@@ -215,7 +228,7 @@ export default function Header({
                 <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-lg glass-primary">
                   <span className="text-xs text-white/60">Balance:</span>
                   <span className="text-sm font-mono font-semibold text-flowpay-300">
-                    {formatBalance(balance)} ETH
+                    {formatBalance(balance)} MNEE
                   </span>
                 </div>
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { ethers } from 'ethers';
+import { CheckCircle, AlertTriangle, AlertOctagon, Square, Waves } from 'lucide-react';
 
 // Animated Particle Flow
 const ParticleFlow = ({ isActive }) => {
@@ -123,19 +124,18 @@ const CountdownTimer = ({ endTime }) => {
 // Health Status Badge
 const HealthBadge = ({ status }) => {
     const configs = {
-        healthy: { label: 'Healthy', icon: '✓', class: 'chip-success' },
-        low: { label: 'Low Balance', icon: '⚠', class: 'chip-warning' },
-        critical: { label: 'Critical', icon: '🚨', class: 'chip-error' },
-        offline: { label: 'Offline', icon: '⏹', class: 'chip' },
+        healthy: { label: 'Healthy', Icon: CheckCircle, class: 'chip-success', animate: true },
+        low: { label: 'Low Balance', Icon: AlertTriangle, class: 'chip-warning', animate: false },
+        critical: { label: 'Critical', Icon: AlertOctagon, class: 'chip-error', animate: true },
+        offline: { label: 'Offline', Icon: Square, class: 'chip', animate: false },
     };
 
     const config = configs[status] || configs.healthy;
+    const IconComponent = config.Icon;
 
     return (
         <span className={`${config.class} flex items-center gap-1`}>
-            <span className={status === 'healthy' || status === 'critical' ? 'animate-pulse' : ''}>
-                {config.icon}
-            </span>
+            <IconComponent className={`w-3 h-3 ${config.animate ? 'animate-pulse' : ''}`} />
             {config.label}
         </span>
     );
@@ -274,7 +274,7 @@ const StreamCard = ({ stream, now }) => {
 // Empty State
 const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="text-6xl mb-4 animate-float">🌊</div>
+        <Waves className="w-16 h-16 text-white/40 mb-4" />
         <h3 className="text-lg font-semibold text-white/80">No Active Streams</h3>
         <p className="text-sm text-white/50 mt-1">Create a stream to start monitoring</p>
     </div>
@@ -304,7 +304,7 @@ export function StreamMonitor({ activeStreams }) {
         return (
             <div className="card-glass p-6 h-full">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    🌊 Stream Monitor
+                    <Waves className="w-5 h-5" /> Stream Monitor
                 </h2>
                 <EmptyState />
             </div>
@@ -316,7 +316,7 @@ export function StreamMonitor({ activeStreams }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    🌊 Stream Monitor
+                    <Waves className="w-5 h-5" /> Stream Monitor
                     <span className="chip-primary">{activeStreams.length} active</span>
                 </h2>
                 <ConnectionStatus isConnected={isConnected} onRetry={() => setIsConnected(true)} />
@@ -332,7 +332,7 @@ export function StreamMonitor({ activeStreams }) {
             {/* Connection Error Banner */}
             {!isConnected && (
                 <div className="mt-4 p-4 rounded-xl bg-error-500/10 border border-error-500/30 flex items-center gap-3 animate-fade-in">
-                    <span className="text-2xl">⚠️</span>
+                    <AlertTriangle className="w-6 h-6 text-warning-400" />
                     <div>
                         <div className="font-semibold text-error-400">Connection Lost</div>
                         <div className="text-sm text-white/60">Retrying connection automatically...</div>

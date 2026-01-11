@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Waves, Zap, Mail, Target, Coins, Bot, Brain, BarChart3 } from 'lucide-react';
 
 // Decision Timeline Entry
 const TimelineEntry = ({ log, isLast, onExpand, isExpanded }) => {
@@ -18,7 +19,7 @@ const TimelineEntry = ({ log, isLast, onExpand, isExpanded }) => {
         ${isStream ? 'bg-flowpay-500/20 border-2 border-flowpay-500' : 'bg-success-500/20 border-2 border-success-500'}
         ${log.isNew ? 'animate-pulse' : ''}
       `}>
-                <span className="text-xs">{isStream ? '🌊' : '⚡'}</span>
+                {isStream ? <Waves className="w-3 h-3 text-flowpay-400" /> : <Zap className="w-3 h-3 text-success-400" />}
             </div>
 
             {/* Content Card */}
@@ -32,8 +33,8 @@ const TimelineEntry = ({ log, isLast, onExpand, isExpanded }) => {
             >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-2">
-                    <span className={`font-bold text-sm uppercase tracking-wide ${isStream ? 'text-flowpay-400' : 'text-success-400'}`}>
-                        {isStream ? '🌊 Streaming Mode' : '⚡ Direct Payment'}
+                    <span className={`font-bold text-sm uppercase tracking-wide flex items-center gap-1 ${isStream ? 'text-flowpay-400' : 'text-success-400'}`}>
+                        {isStream ? <><Waves className="w-4 h-4" /> Streaming Mode</> : <><Zap className="w-4 h-4" /> Direct Payment</>}
                     </span>
                     <span className="text-xs text-white/40">{time.toLocaleTimeString()}</span>
                 </div>
@@ -46,11 +47,11 @@ const TimelineEntry = ({ log, isLast, onExpand, isExpanded }) => {
                 {/* Meta Info */}
                 <div className="mt-3 flex items-center gap-3 text-xs text-white/50">
                     <span className="flex items-center gap-1">
-                        <span>📨</span> {log.volume} requests
+                        <Mail className="w-3 h-3" /> {log.volume} requests
                     </span>
                     {log.confidence && (
                         <span className="flex items-center gap-1">
-                            <span>🎯</span> {Math.round(log.confidence * 100)}% confidence
+                            <Target className="w-3 h-3" /> {Math.round(log.confidence * 100)}% confidence
                         </span>
                     )}
                 </div>
@@ -79,7 +80,7 @@ const TimelineEntry = ({ log, isLast, onExpand, isExpanded }) => {
 
                         {/* Savings */}
                         <div className="flex items-center gap-2 p-3 rounded-lg bg-success-500/10">
-                            <span className="text-success-400">💰</span>
+                            <Coins className="w-4 h-4 text-success-400" />
                             <span className="text-sm text-success-300">
                                 Saved ${log.savings?.toFixed(4) || '0.0077'} with {isStream ? 'streaming' : 'direct'}
                             </span>
@@ -245,10 +246,10 @@ export function DecisionLog({ logs }) {
         return (
             <div className="card-glass p-6 h-full">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                    🤖 AI Decision Log
+                    <Bot className="w-5 h-5" /> AI Decision Log
                 </h2>
                 <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <div className="text-5xl mb-4 animate-float">🧠</div>
+                    <Brain className="w-12 h-12 text-white/40 mb-4" />
                     <div className="text-white/50">No decisions recorded yet</div>
                     <div className="text-xs text-white/30 mt-1">AI decisions will appear here</div>
                 </div>
@@ -261,14 +262,14 @@ export function DecisionLog({ logs }) {
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                    🤖 AI Decision Log
+                    <Bot className="w-5 h-5" /> AI Decision Log
                     <span className="chip-primary">{filteredLogs.length}</span>
                 </h2>
                 <button
                     onClick={() => setShowAnalytics(!showAnalytics)}
-                    className="btn-ghost text-sm"
+                    className="btn-ghost text-sm flex items-center gap-1"
                 >
-                    {showAnalytics ? '📊 Hide Stats' : '📊 Show Stats'}
+                    <BarChart3 className="w-4 h-4" /> {showAnalytics ? 'Hide Stats' : 'Show Stats'}
                 </button>
             </div>
 

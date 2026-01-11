@@ -3,12 +3,13 @@ import { useWallet } from '../context/WalletContext';
 import Header from './Header';
 import Hero from './Hero';
 import { MobileBottomNav, ErrorBoundary } from './ui';
+import { LayoutDashboard, ArrowRightLeft, Bot, BookOpen } from 'lucide-react';
 
 const tabs = [
-  { id: 'dashboard', path: '/', icon: '📊', label: 'Dashboard' },
-  { id: 'streams', path: '/streams', icon: '💸', label: 'Streams' },
-  { id: 'agent', path: '/agent', icon: '🤖', label: 'Agent Console' },
-  { id: 'docs', path: '/docs', icon: '📚', label: 'Docs' },
+  { id: 'dashboard', path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { id: 'streams', path: '/streams', icon: ArrowRightLeft, label: 'Streams' },
+  { id: 'agent', path: '/agent', icon: Bot, label: 'Agent Console' },
+  { id: 'docs', path: '/docs', icon: BookOpen, label: 'Docs' },
 ];
 
 export default function Layout({ children }) {

@@ -4,6 +4,7 @@ import { StreamMonitor } from '../components/StreamMonitor';
 import { EfficiencyMetrics } from '../components/EfficiencyMetrics';
 import { ServiceGraph } from '../components/ServiceGraph';
 import { CollapsibleSection, SkeletonDashboard, ErrorBoundary } from '../components/ui';
+import { Link, Waves, TrendingUp } from 'lucide-react';
 
 export default function Dashboard() {
   const { outgoingStreams, isInitialLoad, isLoadingStreams, walletAddress } = useWallet();
@@ -27,7 +28,7 @@ export default function Dashboard() {
   if (!walletAddress) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="text-6xl mb-4">🔗</div>
+        <Link className="w-16 h-16 text-white/60 mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
         <p className="text-white/60 text-center max-w-md">
           Connect your wallet to view your dashboard, monitor streams, and track efficiency metrics.
@@ -63,19 +64,19 @@ export default function Dashboard() {
       </div>
 
       <ErrorBoundary variant="inline">
-        <CollapsibleSection title="Stream Monitor" icon="🌊" defaultOpen={true}>
+        <CollapsibleSection title="Stream Monitor" icon={<Waves className="w-5 h-5" />} defaultOpen={true}>
           <StreamMonitor activeStreams={activeStreamsForMonitor} />
         </CollapsibleSection>
       </ErrorBoundary>
 
       <ErrorBoundary variant="inline">
-        <CollapsibleSection title="Efficiency Metrics" icon="📈" defaultOpen={true}>
+        <CollapsibleSection title="Efficiency Metrics" icon={<TrendingUp className="w-5 h-5" />} defaultOpen={true}>
           <EfficiencyMetrics efficiencyMetrics={efficiencyMetrics} />
         </CollapsibleSection>
       </ErrorBoundary>
 
       <ErrorBoundary variant="inline">
-        <CollapsibleSection title="Service Graph" icon="🔗" defaultOpen={false}>
+        <CollapsibleSection title="Service Graph" icon={<Link className="w-5 h-5" />} defaultOpen={false}>
           <ServiceGraph />
         </CollapsibleSection>
       </ErrorBoundary>

@@ -9,23 +9,29 @@ const docsContent = {
     content: `
 # Welcome to FlowPay
 
-**FlowPay** is the Streaming Extension for x402 - a hybrid payment protocol that solves the N+1 Signature Problem for AI agent payments.
+**FlowPay** is a payment streaming platform built on Ethereum that enables continuous MNEE token transfers over time.
 
 ## What is FlowPay?
 
-FlowPay enables AI agents to pay for API services using continuous MNEE token streams instead of individual transactions. This dramatically reduces gas costs and improves efficiency.
+FlowPay allows you to create payment streams - continuous flows of tokens from sender to recipient. Instead of sending a lump sum, funds are gradually released based on elapsed time.
 
-### Key Innovation
+### Key Benefits
 
-**2 on-chain transactions** (Open + Close) regardless of request volume.
+- **Flexible Payments** - Cancel anytime and get remaining funds back
+- **Real-time Streaming** - Funds accumulate every second
+- **No Intermediaries** - Direct blockchain transactions
+- **Full Control** - Withdraw accumulated funds whenever you want
 
-| Traditional Approach | FlowPay Approach |
-|---------------------|------------------|
-| 100 requests = 100 signatures | 100 requests = 2 signatures |
-| High gas costs | 95% gas savings |
-| Slow, blocking | Fast, non-blocking |
+## How It Works
 
-## Current Deployment (Sepolia)
+| Step | Action |
+|------|--------|
+| 1 | Connect your MetaMask wallet |
+| 2 | Mint test MNEE tokens (testnet) |
+| 3 | Create a stream to any recipient |
+| 4 | Recipient withdraws funds as they accumulate |
+
+## Current Deployment (Sepolia Testnet)
 
 | Contract | Address |
 |----------|---------|
@@ -34,11 +40,18 @@ FlowPay enables AI agents to pay for API services using continuous MNEE token st
 
 ## Features
 
-- ✅ **x402 Protocol Support** - Standard HTTP payment negotiation
+- ✅ **Web Dashboard** - Easy-to-use interface for all operations
 - ✅ **MNEE Token Streams** - Continuous payment flows  
-- ✅ **AI-Powered Decisions** - Gemini AI chooses optimal payment mode
-- ✅ **Multi-Agent Support** - Mesh network for agent collaboration
-- ✅ **Safety Controls** - Spending limits and emergency stops
+- ✅ **Real-time Monitoring** - Watch your streams progress live
+- ✅ **Withdraw Anytime** - Recipients can claim funds whenever
+- ✅ **Cancel Anytime** - Senders can stop streams and reclaim remaining funds
+
+## Getting Started
+
+1. **Connect Wallet** - Use MetaMask on Sepolia testnet
+2. **Get Test Tokens** - Mint free MNEE from the Streams tab
+3. **Create a Stream** - Send tokens to any address over time
+4. **Monitor Progress** - Watch real-time updates on the Dashboard
 `
   },
   'quick-start': {
@@ -47,14 +60,14 @@ FlowPay enables AI agents to pay for API services using continuous MNEE token st
     content: `
 # Quick Start
 
-Get FlowPay running in under 5 minutes.
+Get FlowPay running in under 5 minutes using the dashboard.
 
 ## Step 1: Connect Your Wallet
 
-1. Open the FlowPay dashboard
-2. Click **Connect Wallet**
+1. Open the FlowPay dashboard at the home page
+2. Click **Connect Wallet** in the header
 3. Select MetaMask and approve the connection
-4. Ensure you're on **Sepolia testnet**
+4. Ensure you're on **Sepolia testnet** (the app will prompt you to switch if needed)
 
 ## Step 2: Get Test Tokens
 
@@ -63,40 +76,39 @@ You need MNEE tokens to create streams:
 1. Navigate to the **Streams** tab
 2. Click **Mint 1000 MNEE** button
 3. Approve the transaction in MetaMask
-4. Wait for confirmation
+4. Wait for confirmation - your balance will update automatically
 
 ## Step 3: Create Your First Stream
 
-\`\`\`javascript
-// Using the SDK
-import { FlowPaySDK } from './sdk/src/FlowPaySDK';
+All stream creation is done through the dashboard:
 
-const sdk = new FlowPaySDK({
-  privateKey: process.env.PRIVATE_KEY,
-  rpcUrl: 'https://rpc.sepolia.org',
-  contractAddress: '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035',
-  mneeAddress: '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896'
-});
+1. Go to the **Streams** tab
+2. In the "Create New Stream" section, enter:
+   - **Recipient Address**: The wallet address to receive payments
+   - **Amount**: How much MNEE to stream (e.g., 10 MNEE)
+   - **Duration**: Select a preset (1 hour, 24 hours, 7 days) or enter custom seconds
+3. Review the flow rate calculation
+4. Click **Start Stream**
+5. Approve the MNEE token allowance (first time only)
+6. Confirm the stream creation transaction
 
-// Create a stream
-const streamId = await sdk.createStream({
-  recipient: '0x...provider_address',
-  amount: '10', // 10 MNEE
-  duration: 3600, // 1 hour
-});
-\`\`\`
+## Step 4: Monitor Your Streams
 
-## Step 4: Make API Requests
+Once your stream is active:
 
-Once your stream is active, make requests to x402-enabled APIs:
+- View real-time progress on the **Dashboard**
+- See all streams in the **Streams** tab
+- Track claimable balances for incoming streams
+- Cancel or withdraw from streams as needed
 
-\`\`\`javascript
-// The SDK handles x402 negotiation automatically
-const response = await sdk.request('https://api.provider.com/premium');
+## Step 5: Withdraw Funds (Recipients)
 
-// First request: SDK detects 402, creates stream, retries
-// Subsequent requests: Use existing stream (no new signatures!)
-\`\`\`
+If you're receiving a stream:
+
+1. Go to **Streams** tab
+2. Find your incoming stream
+3. Click **Withdraw** to claim accumulated funds
+4. Confirm the transaction
 `
   },
   'installation': {
@@ -105,55 +117,59 @@ const response = await sdk.request('https://api.provider.com/premium');
     content: `
 # Installation
 
-Install FlowPay components for different use cases.
+FlowPay is a web-based application - no installation required for end users!
 
-## For AI Agent Developers (SDK)
+## Using FlowPay (End Users)
+
+Simply visit the FlowPay dashboard and connect your wallet. No downloads or installations needed.
+
+### Requirements
+
+- **MetaMask** browser extension (or compatible Web3 wallet)
+- **Sepolia ETH** for gas fees
+- **MNEE tokens** for creating streams (can be minted from the dashboard)
+
+## For Developers (Local Development)
+
+If you want to run FlowPay locally or contribute to development:
+
+### Clone and Setup
 
 \`\`\`bash
-cd sdk
+git clone https://github.com/your-org/flowpay
+cd flowpay
+\`\`\`
+
+### Install Dependencies
+
+\`\`\`bash
+# Root dependencies (smart contracts)
+npm install
+
+# Frontend dependencies
+cd vite-project
 npm install
 \`\`\`
 
-## For API Providers (Middleware)
-
-\`\`\`bash
-cd server
-npm install
-\`\`\`
-
-### Express.js Integration
-
-\`\`\`javascript
-const express = require('express');
-const { flowPayMiddleware } = require('./middleware/flowPayMiddleware');
-
-const app = express();
-
-app.use('/api/premium', flowPayMiddleware({
-  pricePerRequest: '0.001',
-  recipientAddress: '0x...',
-  contractAddress: '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035'
-}));
-\`\`\`
-
-## For Frontend Development
+### Run Development Server
 
 \`\`\`bash
 cd vite-project
-npm install
 npm run dev
 \`\`\`
 
-## Environment Variables
+The app will be available at \`http://localhost:5173\`
 
-Create a \`.env\` file:
+## Environment Variables (Development Only)
+
+For local development, create a \`.env\` file in the root:
 
 \`\`\`bash
-PRIVATE_KEY=0x...
+PRIVATE_KEY=0x...  # For contract deployment only
 SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR_KEY
-ETHERSCAN_API_KEY=...
-GEMINI_API_KEY=...
 \`\`\`
+
+> ⚠️ **Note:** End users don't need any environment variables. All interactions happen through the web dashboard with MetaMask.
 `
   },
   'architecture': {
@@ -162,7 +178,7 @@ GEMINI_API_KEY=...
     content: `
 # Architecture Overview
 
-FlowPay is designed as a modular, extensible payment protocol.
+FlowPay is designed as a simple, user-friendly payment streaming platform.
 
 ## System Architecture
 
@@ -171,17 +187,18 @@ FlowPay is designed as a modular, extensible payment protocol.
 │                      FlowPay System                          │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │   Consumer   │───▶│   Provider   │───▶│  Blockchain  │   │
-│  │   Agent      │    │   (x402)     │    │  (Sepolia)   │   │
-│  │   + SDK      │◀───│              │◀───│              │   │
-│  └──────────────┘    └──────────────┘    └──────────────┘   │
-│         │                   │                   │            │
-│         ▼                   ▼                   ▼            │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │   Gemini     │    │  Dashboard   │    │  MorphStream │   │
-│  │   AI Brain   │    │   (React)    │    │  + MockMNEE  │   │
-│  └──────────────┘    └──────────────┘    └──────────────┘   │
+│  ┌──────────────┐                       ┌──────────────┐    │
+│  │    User      │                       │  Blockchain  │    │
+│  │   Browser    │◀─────────────────────▶│  (Sepolia)   │    │
+│  │  + MetaMask  │                       │              │    │
+│  └──────────────┘                       └──────────────┘    │
+│         │                                      │            │
+│         ▼                                      ▼            │
+│  ┌──────────────┐                       ┌──────────────┐    │
+│  │   FlowPay    │                       │  MorphStream │    │
+│  │  Dashboard   │                       │  + MockMNEE  │    │
+│  │   (React)    │                       │  Contracts   │    │
+│  └──────────────┘                       └──────────────┘    │
 │                                                              │
 └─────────────────────────────────────────────────────────────┘
 \`\`\`
@@ -190,30 +207,41 @@ FlowPay is designed as a modular, extensible payment protocol.
 
 | Component | Description |
 |-----------|-------------|
+| **Dashboard** | React web app for managing streams |
 | **MorphStream** | Smart contract for payment streams |
-| **MockMNEE** | Test ERC-20 token |
-| **FlowPaySDK** | Agent SDK for x402 negotiation |
-| **flowPayMiddleware** | Express.js x402 middleware |
-| **GeminiPaymentBrain** | AI decision engine |
-| **SpendingMonitor** | Safety & limits |
+| **MockMNEE** | Test ERC-20 token for payments |
+| **MetaMask** | User's wallet for signing transactions |
 
-## Data Flow
+## User Flow
 
-1. Agent → Provider: \`GET /api/premium\`
-2. Provider → Agent: \`402 Payment Required + x402 headers\`
-3. Agent → AI Brain: Should I stream or pay directly?
-4. Agent → Blockchain: Create stream
-5. Agent → Provider: Retry with \`X-FlowPay-Stream-ID\`
-6. Provider → Agent: \`200 OK + data\`
+1. User connects MetaMask wallet to dashboard
+2. User mints test MNEE tokens (testnet only)
+3. User creates a stream by specifying recipient, amount, duration
+4. Smart contract locks MNEE tokens and starts streaming
+5. Recipient can withdraw accumulated funds anytime
+6. Stream completes or either party cancels
+
+## Key Features
+
+- **No Backend Required** - All interactions are directly with the blockchain
+- **Real-time Updates** - Dashboard shows live stream progress
+- **Self-Custody** - Users maintain full control of their funds
+- **Transparent** - All transactions visible on block explorer
 `
   },
   'x402-protocol': {
     title: 'x402 Protocol',
     icon: '🔄',
     content: `
-# x402 Protocol
+# x402 Protocol (Advanced)
 
-FlowPay implements the x402 protocol for HTTP-based payment negotiation.
+FlowPay is built with x402 protocol compatibility in mind for future integrations.
+
+> ℹ️ **Note:** This section describes the underlying protocol design. As an end user, you don't need to understand this - just use the dashboard!
+
+## What is x402?
+
+x402 is a proposed standard for HTTP-based payment negotiation, using the HTTP 402 "Payment Required" status code.
 
 ## Protocol Flow
 
@@ -234,6 +262,8 @@ FlowPay implements the x402 protocol for HTTP-based payment negotiation.
 
 ## Response Headers (402)
 
+When a server requires payment, it responds with:
+
 \`\`\`http
 HTTP/1.1 402 Payment Required
 X-Payment-Required: true
@@ -246,6 +276,8 @@ X-Payment-Network: sepolia
 \`\`\`
 
 ## Request Headers (With Payment)
+
+After creating a stream, requests include:
 
 \`\`\`http
 GET /api/resource HTTP/1.1
@@ -262,6 +294,15 @@ X-FlowPay-Timestamp: 1704067200
 | \`X-Payment-Currency\` | Token symbol (MNEE) |
 | \`X-Payment-Recipient\` | Provider's address |
 | \`X-FlowPay-Stream-ID\` | Active stream ID |
+
+## Future Integration
+
+The x402 protocol enables future features like:
+- Automated API payments
+- Pay-per-request services
+- Streaming subscriptions
+
+Currently, FlowPay focuses on the dashboard experience for manual stream management.
 `
   },
   'payment-streams': {
@@ -270,11 +311,11 @@ X-FlowPay-Timestamp: 1704067200
     content: `
 # Payment Streams
 
-Payment streams are the core innovation of FlowPay.
+Payment streams are the core feature of FlowPay.
 
 ## What is a Payment Stream?
 
-A payment stream is a continuous flow of MNEE tokens from sender to recipient over time.
+A payment stream is a continuous flow of MNEE tokens from sender to recipient over time. Instead of sending a lump sum, funds are gradually released based on elapsed time.
 
 \`\`\`
 Time ─────────────────────────────────────────▶
@@ -290,24 +331,27 @@ Time ─────────────────────────
 
 ## Stream Lifecycle
 
-### 1. Creation
-\`\`\`javascript
-await contract.createStream(recipient, duration, amount, metadata);
-\`\`\`
+### 1. Creation (via Dashboard)
+- Go to **Streams** tab
+- Enter recipient address, amount, and duration
+- Approve MNEE token allowance
+- Confirm stream creation transaction
 
 ### 2. Active Streaming
-- Funds accumulate for recipient
-- Claimable balance increases per second
+- Funds accumulate for recipient in real-time
+- Claimable balance increases every second
 - Either party can cancel anytime
+- Progress visible on dashboard
 
-### 3. Withdrawal
-\`\`\`javascript
-await contract.withdrawFromStream(streamId);
-\`\`\`
+### 3. Withdrawal (via Dashboard)
+- Recipient clicks **Withdraw** on their incoming stream
+- All accumulated funds are transferred
+- Can withdraw multiple times during stream
 
 ### 4. Completion
-- Stream reaches stop time
-- All funds claimable by recipient
+- Stream reaches stop time automatically
+- All remaining funds become claimable
+- Recipient can withdraw final balance
 
 ## Flow Rate Calculation
 
@@ -317,13 +361,21 @@ flowRate = totalAmount / duration
 
 **Example:** 3600 MNEE over 1 hour = 1 MNEE/second
 
+## Stream Actions
+
+| Action | Who Can Do It | Effect |
+|--------|---------------|--------|
+| **Create** | Anyone with MNEE | Locks tokens, starts stream |
+| **Withdraw** | Recipient only | Claims accumulated funds |
+| **Cancel** | Sender or Recipient | Stops stream, returns remaining to sender |
+
 ## Benefits
 
 | Aspect | Direct Payment | Stream Payment |
 |--------|---------------|----------------|
-| Signatures | 1 per request | 2 total |
-| Gas cost | High | Low |
 | Flexibility | None | Cancel anytime |
+| Partial payment | No | Yes, withdraw anytime |
+| Refunds | Manual | Automatic on cancel |
 `
   },
   'morphstream-contract': {
@@ -332,71 +384,59 @@ flowRate = totalAmount / duration
     content: `
 # MorphStream Contract
 
-The core payment streaming smart contract.
+The smart contract that powers FlowPay payment streams.
 
 **Address:** \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\`
 
-## Functions
+**Network:** Sepolia Testnet
 
-### createStream
+## What Does It Do?
 
-Creates a new payment stream.
+MorphStream handles all the on-chain logic for payment streams:
 
-\`\`\`solidity
-function createStream(
-    address recipient,
-    uint256 duration,
-    uint256 amount,
-    string memory metadata
-) external
-\`\`\`
+- **Creates streams** - Locks MNEE tokens and starts the payment flow
+- **Tracks balances** - Calculates how much has been streamed in real-time
+- **Processes withdrawals** - Transfers accumulated funds to recipients
+- **Handles cancellations** - Returns remaining funds to senders
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| recipient | address | Payment receiver |
-| duration | uint256 | Stream duration (seconds) |
-| amount | uint256 | Total MNEE (wei) |
-| metadata | string | JSON metadata |
+## Stream Data
 
-### withdrawFromStream
+Each stream stores:
 
-Withdraws available funds.
-
-\`\`\`solidity
-function withdrawFromStream(uint256 streamId) external
-\`\`\`
-
-### cancelStream
-
-Cancels an active stream.
-
-\`\`\`solidity
-function cancelStream(uint256 streamId) external
-\`\`\`
-
-### getClaimableBalance
-
-Returns withdrawable amount.
-
-\`\`\`solidity
-function getClaimableBalance(uint256 streamId) external view returns (uint256)
-\`\`\`
+| Field | Description |
+|-------|-------------|
+| sender | Address that created the stream |
+| recipient | Address receiving the payments |
+| totalAmount | Total MNEE locked in the stream |
+| flowRate | MNEE per second being streamed |
+| startTime | When the stream started |
+| stopTime | When the stream will end |
+| amountWithdrawn | How much recipient has claimed |
+| isActive | Whether stream is still running |
 
 ## Events
 
-| Event | Description |
-|-------|-------------|
-| \`StreamCreated\` | New stream created |
-| \`Withdrawn\` | Funds withdrawn |
-| \`StreamCancelled\` | Stream cancelled |
+The contract emits events that the dashboard listens to:
 
-## Gas Costs
+| Event | When It Fires |
+|-------|---------------|
+| \`StreamCreated\` | New stream is created |
+| \`Withdrawn\` | Recipient withdraws funds |
+| \`StreamCancelled\` | Stream is cancelled |
 
-| Function | Gas |
-|----------|-----|
-| createStream | ~150,000 |
-| withdrawFromStream | ~80,000 |
-| cancelStream | ~100,000 |
+## Gas Costs (Approximate)
+
+| Action | Gas Cost | ~USD at 20 gwei |
+|--------|----------|-----------------|
+| Create Stream | ~150,000 | ~$0.50 |
+| Withdraw | ~80,000 | ~$0.25 |
+| Cancel Stream | ~100,000 | ~$0.35 |
+
+> 💡 **Tip:** On Sepolia testnet, gas is free! Just get test ETH from a faucet.
+
+## View on Block Explorer
+
+[View MorphStream on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x155A00fBE3D290a8935ca4Bf5244283685Bb0035)
 `
   },
   'mnee-token': {
@@ -405,7 +445,7 @@ function getClaimableBalance(uint256 streamId) external view returns (uint256)
     content: `
 # MockMNEE Token
 
-Test ERC-20 token for FlowPay development.
+Test ERC-20 token for FlowPay on Sepolia testnet.
 
 **Address:** \`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896\`
 
@@ -416,105 +456,168 @@ Test ERC-20 token for FlowPay development.
 | Name | Mock MNEE |
 | Symbol | MNEE |
 | Decimals | 18 |
-
-## Functions
-
-### Standard ERC-20
-
-\`\`\`solidity
-function balanceOf(address account) external view returns (uint256)
-function transfer(address recipient, uint256 amount) external returns (bool)
-function approve(address spender, uint256 amount) external returns (bool)
-function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)
-\`\`\`
-
-### mint (Test Only)
-
-Mints new tokens to any address.
-
-\`\`\`solidity
-function mint(address to, uint256 amount) external
-\`\`\`
+| Network | Sepolia Testnet |
 
 ## Getting Test Tokens
 
-### Via Dashboard
+### Via Dashboard (Recommended)
 
-1. Connect wallet to FlowPay dashboard
-2. Go to **Streams** tab
-3. Click **Mint 1000 MNEE**
-4. Confirm transaction
+1. Connect your wallet to the FlowPay dashboard
+2. Go to the **Streams** tab
+3. Click **Mint 1000 MNEE** button
+4. Confirm the transaction in MetaMask
+5. Your balance will update automatically
 
-### Via Code
+### Check Your Balance
+
+Your MNEE balance is displayed in the header after connecting your wallet.
+
+## Token Usage
+
+MNEE tokens are used for:
+
+- **Creating streams** - Lock tokens to start a payment stream
+- **Receiving payments** - Withdraw accumulated tokens from incoming streams
+- **Testing** - Safe to experiment on testnet without real value
+
+## Important Notes
+
+> ⚠️ **Testnet Only:** MockMNEE is for testing on Sepolia. It has no real value.
+
+> ℹ️ **Free Minting:** Anyone can mint unlimited test tokens for development.
+
+> 🔄 **Production:** Real MNEE tokens will be used on mainnet deployment.
+
+## View on Block Explorer
+
+[View MockMNEE on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x96B1FE54Ee89811f46ecE4a347950E0D682D3896)
+
+---
+
+## Graduating to Mainnet
+
+When you're ready to move from testnet to mainnet, you'll need to replace MockMNEE with the real MNEE token.
+
+### Mainnet MNEE Token
+
+| Property | Value |
+|----------|-------|
+| Contract Address | \`0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF\` |
+| Network | Ethereum Mainnet |
+| Symbol | MNEE |
+| Decimals | 18 |
+
+### Migration Steps (For Developers)
+
+1. **Update the token address** in \`vite-project/src/contactInfo.js\`:
 
 \`\`\`javascript
-const mnee = new ethers.Contract(mneeAddress, mneeABI, signer);
-await mnee.mint(myAddress, ethers.parseEther('1000'));
+// Change from testnet MockMNEE
+export const mneeTokenAddress = '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896';
+
+// To mainnet MNEE
+export const mneeTokenAddress = '0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF';
 \`\`\`
 
-> ⚠️ **Note:** MockMNEE is for testing only. Production will use real MNEE.
+2. **Update the network configuration** to target Ethereum Mainnet (Chain ID: 1) instead of Sepolia (Chain ID: 11155111)
+
+3. **Deploy MorphStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
+
+4. **Remove the Mint button** - Real MNEE cannot be freely minted like the test token
+
+### Key Differences
+
+| Feature | MockMNEE (Testnet) | MNEE (Mainnet) |
+|---------|-------------------|----------------|
+| Free minting | ✅ Yes | ❌ No |
+| Real value | ❌ No | ✅ Yes |
+| Gas costs | Free (testnet ETH) | Real ETH required |
+| Network | Sepolia | Ethereum Mainnet |
+
+> ⚠️ **Important:** Always test thoroughly on Sepolia before deploying to mainnet. Mainnet transactions use real funds and cannot be reversed.
+
+### Acquiring Real MNEE
+
+On mainnet, you'll need to acquire MNEE tokens through:
+- Supported exchanges
+- Token swaps (Uniswap, etc.)
+- Direct purchase
+
+Check the official MNEE documentation for current acquisition methods.
 `
   },
   'sdk-reference': {
-    title: 'SDK Reference',
+    title: 'Dashboard Guide',
     icon: '🛠️',
     content: `
-# FlowPaySDK Reference
+# Dashboard Guide
 
-The main SDK class for AI agent payments.
+Complete guide to using the FlowPay web dashboard.
 
-## Installation
+## Navigation
 
-\`\`\`bash
-cd sdk && npm install
-\`\`\`
+The dashboard has four main sections accessible from the top navigation:
 
-## Quick Start
+| Tab | Purpose |
+|-----|---------|
+| **Dashboard** | Overview of your streams and activity |
+| **Streams** | Create and manage payment streams |
+| **Agent Console** | AI agent testing interface |
+| **Docs** | This documentation |
 
-\`\`\`typescript
-import { FlowPaySDK } from './FlowPaySDK';
+## Connecting Your Wallet
 
-const sdk = new FlowPaySDK({
-  privateKey: process.env.PRIVATE_KEY,
-  rpcUrl: 'https://rpc.sepolia.org',
-  contractAddress: '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035',
-  mneeAddress: '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896'
-});
+1. Click **Connect Wallet** in the header
+2. MetaMask will prompt you to connect
+3. Approve the connection request
+4. If not on Sepolia, you'll be prompted to switch networks
 
-// Make requests - SDK handles x402 automatically
-const response = await sdk.request('https://api.provider.com/premium');
-\`\`\`
+## Dashboard Tab
 
-## Configuration
+The main dashboard shows:
 
-| Option | Type | Description |
-|--------|------|-------------|
-| privateKey | string | Wallet private key |
-| rpcUrl | string | Ethereum RPC endpoint |
-| contractAddress | string | MorphStream address |
-| mneeAddress | string | MNEE token address |
-| agentId | string | Unique agent ID |
-| defaultStreamDuration | number | Default duration (seconds) |
+- **Active Streams** - Count of your ongoing streams
+- **Stream Monitor** - Real-time visualization of stream progress
+- **Efficiency Metrics** - Usage statistics
 
-## Methods
+## Streams Tab
 
-### request(url, options)
-Makes HTTP request with automatic x402 handling.
+### Creating a Stream
 
-### createStream(params)
-Creates a new payment stream.
+1. Fill in the **Create New Stream** form:
+   - **Recipient**: Wallet address to receive payments
+   - **Token**: MNEE (currently the only supported token)
+   - **Amount**: Total MNEE to stream
+   - **Duration**: How long the stream should last
 
-### getStream(streamId)
-Gets stream details.
+2. Click **Start Stream**
+3. Approve token allowance (first time only)
+4. Confirm the transaction
 
-### withdrawFromStream(streamId)
-Withdraws available funds.
+### Managing Streams
 
-### cancelStream(streamId)
-Cancels an active stream.
+**Outgoing Streams** (you're sending):
+- View progress and remaining time
+- Cancel to stop and reclaim remaining funds
 
-### getMneeBalance(address?)
-Gets MNEE token balance.
+**Incoming Streams** (you're receiving):
+- View claimable balance in real-time
+- Click **Withdraw** to claim accumulated funds
+
+### Minting Test Tokens
+
+Click **Mint 1000 MNEE** to get free test tokens on Sepolia.
+
+## Agent Console Tab
+
+The Agent Console provides an AI-powered interface for testing x402 payment flows. This is primarily for demonstration and testing purposes.
+
+## Status Bar
+
+The bottom status bar shows:
+- Current operation status
+- Transaction confirmations
+- Error messages
 `
   },
   'deployment': {
@@ -589,45 +692,72 @@ Free testnet ETH:
 ## General
 
 ### What is FlowPay?
-FlowPay is a payment streaming protocol that enables AI agents to pay for API services using continuous MNEE token streams.
+FlowPay is a payment streaming platform that enables continuous MNEE token transfers over time, rather than one-time payments.
 
 ### What problem does FlowPay solve?
-FlowPay solves the **N+1 Signature Problem**: traditionally, N API requests require N payment signatures. FlowPay reduces this to just 2 signatures.
+FlowPay enables flexible, time-based payments where funds are released gradually. This is useful for subscriptions, salaries, or any scenario where you want to pay over time with the ability to cancel.
 
 ### Which networks are supported?
-Currently Ethereum Sepolia testnet. Mainnet deployment is planned.
+Currently Ethereum Sepolia testnet only. Mainnet deployment is planned for the future.
+
+### Is there an SDK or API?
+No, FlowPay is currently a frontend-only application. All interactions are done through the web dashboard using MetaMask.
 
 ## Technical
 
 ### How is the flow rate calculated?
 \`flowRate = totalAmount / duration\`
 
+For example, streaming 3600 MNEE over 1 hour = 1 MNEE per second.
+
 ### Can I cancel a stream?
-Yes, both sender and recipient can cancel anytime. Recipient gets streamed amount, sender gets remaining.
+Yes, both sender and recipient can cancel anytime. The recipient receives all streamed funds up to that point, and the sender gets the remaining balance back.
 
 ### What happens when a stream expires?
-No more funds flow. Recipient can still withdraw unclaimed balance.
+The stream stops automatically. No more funds flow after the stop time. The recipient can still withdraw any unclaimed balance.
+
+### Do I need to keep the browser open?
+No! Streams run on the blockchain, not in your browser. Once created, the stream continues regardless of whether you're online.
 
 ## Usage
 
 ### How do I get test MNEE tokens?
-1. Connect wallet to dashboard
-2. Go to Streams tab
+1. Connect your wallet to the dashboard
+2. Go to the Streams tab
 3. Click "Mint 1000 MNEE"
+4. Confirm the transaction
 
 ### How do I create a stream?
-Via Dashboard or SDK - enter recipient, amount, duration.
+1. Go to the Streams tab
+2. Enter recipient address, amount, and duration
+3. Click "Start Stream"
+4. Approve the token allowance (first time only)
+5. Confirm the transaction
+
+### How do I withdraw from a stream?
+1. Go to the Streams tab
+2. Find your incoming stream
+3. Click "Withdraw"
+4. Confirm the transaction
 
 ## Troubleshooting
 
 ### "Insufficient funds for gas"
-Get Sepolia ETH from faucets.
+You need Sepolia ETH for gas fees. Get free testnet ETH from:
+- https://sepoliafaucet.com
+- https://faucet.sepolia.dev
 
 ### "MNEE transfer failed"
-Check balance and token approval.
+Check that you have enough MNEE balance and have approved the token allowance.
 
 ### "Stream is not active"
-Stream may have expired or been cancelled.
+The stream may have expired (reached stop time) or been cancelled by either party.
+
+### "Wrong network"
+Make sure MetaMask is connected to Sepolia testnet. The app will prompt you to switch if needed.
+
+### Transactions are slow
+Sepolia testnet can sometimes be congested. Wait a few minutes and try again, or check the transaction status on Sepolia Etherscan.
 `
   }
 };
@@ -660,7 +790,7 @@ const sidebarNav = [
   {
     title: 'Reference',
     items: [
-      { id: 'sdk-reference', title: 'SDK Reference' },
+      { id: 'sdk-reference', title: 'Dashboard Guide' },
       { id: 'deployment', title: 'Deployment' },
       { id: 'faq', title: 'FAQ' },
     ]

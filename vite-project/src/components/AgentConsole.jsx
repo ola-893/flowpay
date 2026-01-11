@@ -1,4 +1,8 @@
 import React, { useState, useMemo } from 'react';
+import { 
+  Coins, ArrowRightLeft, Mail, Zap, Eye, EyeOff, Copy, RefreshCw, 
+  Save, TrendingUp, Shield, CheckCircle, AlertTriangle, Info
+} from 'lucide-react';
 
 // Agent Avatar Component
 const AgentAvatar = ({ agentId, status }) => {
@@ -21,7 +25,7 @@ const AgentAvatar = ({ agentId, status }) => {
 };
 
 // Quick Stat Card
-const StatCard = ({ icon, label, value, trend, color = 'flowpay' }) => {
+const StatCard = ({ icon: Icon, label, value, trend, color = 'flowpay' }) => {
     const colorClasses = {
         flowpay: 'text-flowpay-400',
         accent: 'text-accent-400',
@@ -32,7 +36,7 @@ const StatCard = ({ icon, label, value, trend, color = 'flowpay' }) => {
     return (
         <div className="p-4 rounded-xl glass hover-lift">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-xl">{icon}</span>
+                <Icon className="w-5 h-5 text-white/60" />
                 {trend && (
                     <span className={`text-xs ${trend > 0 ? 'text-success-400' : 'text-error-400'}`}>
                         {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
@@ -94,21 +98,21 @@ const ApiKeyDisplay = ({ apiKey, onRegenerate }) => {
                         onClick={() => setIsVisible(!isVisible)}
                         className="text-white/40 hover:text-white"
                     >
-                        {isVisible ? '👁️' : '👁️‍🗨️'}
+                        {isVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                 </div>
                 <button
                     onClick={handleCopy}
                     className={`btn-outline px-3 ${copied ? 'text-success-400 border-success-400' : ''}`}
                 >
-                    {copied ? '✓' : '📋'}
+                    {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
                 <button
                     onClick={onRegenerate}
                     className="btn-outline px-3"
                     title="Regenerate Key"
                 >
-                    🔄
+                    <RefreshCw className="w-4 h-4" />
                 </button>
             </div>
         </div>
@@ -167,8 +171,8 @@ const AlertThresholds = ({ thresholds, onChange }) => {
 const RecentAlerts = ({ alerts }) => {
     if (!alerts?.length) {
         return (
-            <div className="text-center py-6 text-white/40 text-sm">
-                ✅ No recent alerts
+            <div className="text-center py-6 text-white/40 text-sm flex items-center justify-center gap-2">
+                <CheckCircle className="w-4 h-4 text-success-400" /> No recent alerts
             </div>
         );
     }
@@ -182,7 +186,9 @@ const RecentAlerts = ({ alerts }) => {
                         alert.type === 'warning' ? 'bg-warning-500/10 border border-warning-500/20' :
                             'bg-white/5 border border-white/10'}
         `}>
-                    <span>{alert.type === 'error' ? '🚨' : alert.type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+                    {alert.type === 'error' ? <AlertTriangle className="w-4 h-4 text-error-400 shrink-0 mt-0.5" /> : 
+                     alert.type === 'warning' ? <AlertTriangle className="w-4 h-4 text-warning-400 shrink-0 mt-0.5" /> : 
+                     <Info className="w-4 h-4 text-flowpay-400 shrink-0 mt-0.5" />}
                     <div>
                         <div className="text-white/80">{alert.message}</div>
                         <div className="text-xs text-white/40 mt-1">{alert.time}</div>
@@ -210,8 +216,8 @@ const EmergencyModal = ({ isOpen, onConfirm, onCancel, action }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
             <div className="w-full max-w-md glass rounded-2xl p-6 animate-scale-in">
-                <h3 className={`text-xl font-bold ${action === 'stop' ? 'text-error-400' : 'text-success-400'}`}>
-                    {action === 'stop' ? '🚨 Emergency Stop' : '▶️ Resume System'}
+                <h3 className={`text-xl font-bold ${action === 'stop' ? 'text-error-400' : 'text-success-400'} flex items-center gap-2`}>
+                    {action === 'stop' ? <><AlertTriangle className="w-5 h-5" /> Emergency Stop</> : <><CheckCircle className="w-5 h-5" /> Resume System</>}
                 </h3>
 
                 <p className="mt-3 text-sm text-white/70">
@@ -350,17 +356,17 @@ export function AgentConsole({ config, setConfig, isPaused, setIsPaused, sdk }) 
                             <div className="text-sm text-white/50 mt-1">SDK Version 1.0.0 • FlowPay Agent</div>
                         </div>
 
-                        <button onClick={handleSave} className="btn-outline">
-                            💾 Save
+                        <button onClick={handleSave} className="btn-outline flex items-center gap-2">
+                            <Save className="w-4 h-4" /> Save
                         </button>
                     </div>
 
                     {/* Quick Stats */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
-                        <StatCard icon="💰" label="Daily Spend" value={`$${spending.daily}`} trend={-12} color="flowpay" />
-                        <StatCard icon="💸" label="Active Streams" value={spending.streams} trend={8} color="accent" />
-                        <StatCard icon="📨" label="Total Requests" value={spending.requests.toLocaleString()} color="success" />
-                        <StatCard icon="⚡" label="Avg Response" value="142ms" color="warning" />
+                        <StatCard icon={Coins} label="Daily Spend" value={`$${spending.daily}`} trend={-12} color="flowpay" />
+                        <StatCard icon={ArrowRightLeft} label="Active Streams" value={spending.streams} trend={8} color="accent" />
+                        <StatCard icon={Mail} label="Total Requests" value={spending.requests.toLocaleString()} color="success" />
+                        <StatCard icon={Zap} label="Avg Response" value="142ms" color="warning" />
                     </div>
 
                     {/* API Key */}
@@ -370,9 +376,9 @@ export function AgentConsole({ config, setConfig, isPaused, setIsPaused, sdk }) 
                 </div>
 
                 {/* Spending Limits Section */}
-                <div className="card-glass p-6 space-y-6">
+                <div className="space-y-6">
                     <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                        📊 Spending Limits
+                        <TrendingUp className="w-5 h-5" /> Spending Limits
                     </h3>
 
                     {/* Budget Gauges */}
@@ -392,7 +398,7 @@ export function AgentConsole({ config, setConfig, isPaused, setIsPaused, sdk }) 
                 {/* Emergency Controls Section */}
                 <div className={`card-glass p-6 ${isPaused ? 'border-warning-500/50' : ''}`}>
                     <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
-                        🛡️ System Controls
+                        <Shield className="w-5 h-5" /> System Controls
                     </h3>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

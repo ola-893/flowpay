@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { LayoutDashboard, ArrowRightLeft, Bot, BookOpen } from 'lucide-react';
 
 const defaultTabs = [
-  { id: 'dashboard', path: '/', icon: '📊', label: 'Dashboard' },
-  { id: 'streams', path: '/streams', icon: '💸', label: 'Streams' },
-  { id: 'agent', path: '/agent', icon: '🤖', label: 'Agent' },
-  { id: 'docs', path: '/docs', icon: '📚', label: 'Docs' },
+  { id: 'dashboard', path: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { id: 'streams', path: '/streams', icon: ArrowRightLeft, label: 'Streams' },
+  { id: 'agent', path: '/agent', icon: Bot, label: 'Agent' },
+  { id: 'docs', path: '/docs', icon: BookOpen, label: 'Docs' },
 ];
 
 // Bottom Navigation for Mobile
@@ -37,27 +38,30 @@ export function MobileBottomNav({ walletAddress, tabs = defaultTabs }) {
       `}
     >
       <div className="flex items-center justify-around px-2 py-2">
-        {tabs.map((tab) => (
-          <Link
-            key={tab.id}
-            to={tab.path}
-            className={`
-              flex flex-col items-center justify-center
-              min-w-[64px] py-2 px-3 rounded-xl
-              transition-all duration-200 touch-manipulation
-              ${activeTab === tab.id
-                ? 'bg-flowpay-500/20 text-flowpay-300'
-                : 'text-white/50 active:bg-white/10'
-              }
-            `}
-          >
-            <span className="text-xl mb-0.5">{tab.icon}</span>
-            <span className="text-[10px] font-medium">{tab.label}</span>
-            {activeTab === tab.id && (
-              <div className="absolute bottom-1 w-1 h-1 rounded-full bg-flowpay-400" />
-            )}
-          </Link>
-        ))}
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <Link
+              key={tab.id}
+              to={tab.path}
+              className={`
+                flex flex-col items-center justify-center
+                min-w-[64px] py-2 px-3 rounded-xl
+                transition-all duration-200 touch-manipulation
+                ${activeTab === tab.id
+                  ? 'bg-flowpay-500/20 text-flowpay-300'
+                  : 'text-white/50 active:bg-white/10'
+                }
+              `}
+            >
+              <Icon className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px] font-medium">{tab.label}</span>
+              {activeTab === tab.id && (
+                <div className="absolute bottom-1 w-1 h-1 rounded-full bg-flowpay-400" />
+              )}
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );
@@ -74,7 +78,7 @@ export function CollapsibleSection({ title, icon, children, defaultOpen = true, 
         className="w-full flex items-center justify-between p-4 md:p-6 touch-manipulation"
       >
         <div className="flex items-center gap-2">
-          {icon && <span className="text-lg">{icon}</span>}
+          {icon && (typeof icon === 'string' ? <span className="text-lg">{icon}</span> : icon)}
           <h3 className="text-base md:text-lg font-semibold text-white">{title}</h3>
         </div>
         <svg

@@ -118,10 +118,13 @@ export function WalletProvider({ children }) {
   };
 
   const fetchStreamsFromEvents = useCallback(async (me) => {
-    if (!contractWithProvider) return { incoming: [], outgoing: [] };
+    if (!contractWithProvider || !provider) return { incoming: [], outgoing: [] };
     try {
       const filter = contractWithProvider.filters.StreamCreated();
-      const events = await contractWithProvider.queryFilter(filter, 0, 'latest');
+      // Limit block range to avoid RPC "exceed maximum block range" error
+      const latestBlock = await provider.getBlockNumber();
+      const fromBlock = Math.max(0, latestBlock - 49000); // Stay under 50k block limit
+      const events = await contractWithProvider.queryFilter(filter, fromBlock, latestBlock);
       const streamCards = await Promise.all(events.map(async (ev) => {
         const streamId = ev.args.streamId;
         const [sender, recipient, totalAmount, flowRate, startTime, stopTime, amountWithdrawn, isActive] = 
@@ -138,7 +141,7 @@ export function WalletProvider({ children }) {
       return { incoming: streamCards.filter(s => s.recipient.toLowerCase() === meLc),
                outgoing: streamCards.filter(s => s.sender.toLowerCase() === meLc) };
     } catch (err) { console.error('Failed to fetch events:', err); return { incoming: [], outgoing: [] }; }
-  }, [contractWithProvider]);
+  }, [contractWithProvider, provider]);
 
   const refreshStreams = useCallback(async () => {
     if (!walletAddress) return;

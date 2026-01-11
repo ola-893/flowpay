@@ -3,6 +3,7 @@ import { useWallet } from '../context/WalletContext';
 import { EfficiencyMetrics } from '../components/EfficiencyMetrics';
 import { ServiceGraph } from '../components/ServiceGraph';
 import { ErrorBoundary } from '../components/ui';
+import { TrendingUp, Zap, Link, ClipboardList } from 'lucide-react';
 
 export default function Analytics() {
   const { walletAddress, outgoingStreams, incomingStreams, formatEth } = useWallet();
@@ -29,7 +30,7 @@ export default function Analytics() {
   if (!walletAddress) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <div className="text-6xl mb-4">📈</div>
+        <TrendingUp className="w-16 h-16 text-white/60 mb-4" />
         <h2 className="text-2xl font-bold text-white mb-2">Connect Your Wallet</h2>
         <p className="text-white/60 text-center max-w-md">
           Connect your wallet to view detailed analytics and performance metrics.
@@ -86,7 +87,9 @@ export default function Analytics() {
 
       {/* Efficiency Section */}
       <div className="card-glass p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">⚡ Efficiency Analysis</h3>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Zap className="w-5 h-5" /> Efficiency Analysis
+        </h3>
         <div className="grid md:grid-cols-3 gap-6">
           <div className="text-center p-4 bg-white/5 rounded-lg">
             <div className="text-4xl font-bold text-gradient-primary">
@@ -116,14 +119,18 @@ export default function Analytics() {
 
       <ErrorBoundary variant="inline">
         <div className="card-glass p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">🔗 Service Connections</h3>
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Link className="w-5 h-5" /> Service Connections
+          </h3>
           <ServiceGraph />
         </div>
       </ErrorBoundary>
 
       {/* Recent Activity */}
       <div className="card-glass p-6">
-        <h3 className="text-lg font-semibold text-white mb-4">📋 Recent Activity</h3>
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <ClipboardList className="w-5 h-5" /> Recent Activity
+        </h3>
         <div className="space-y-3">
           {[...outgoingStreams, ...incomingStreams]
             .sort((a, b) => b.startTime - a.startTime)

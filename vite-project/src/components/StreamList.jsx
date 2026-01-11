@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import StreamCard from './StreamCard.jsx';
+import { Calendar, Coins, Zap, Search, Inbox, Pause, CheckCircle, Ban, Plus, Loader2 } from 'lucide-react';
 
 // Filter Tab Component
 const FilterTab = ({ label, count, active, onClick }) => (
@@ -24,11 +25,11 @@ const FilterTab = ({ label, count, active, onClick }) => (
 // Sort Dropdown
 const SortDropdown = ({ value, onChange }) => {
   const options = [
-    { value: 'date-desc', label: '📅 Newest First' },
-    { value: 'date-asc', label: '📅 Oldest First' },
-    { value: 'amount-desc', label: '💰 Highest Amount' },
-    { value: 'amount-asc', label: '💰 Lowest Amount' },
-    { value: 'rate-desc', label: '⚡ Highest Rate' },
+    { value: 'date-desc', label: 'Newest First', Icon: Calendar },
+    { value: 'date-asc', label: 'Oldest First', Icon: Calendar },
+    { value: 'amount-desc', label: 'Highest Amount', Icon: Coins },
+    { value: 'amount-asc', label: 'Lowest Amount', Icon: Coins },
+    { value: 'rate-desc', label: 'Highest Rate', Icon: Zap },
   ];
 
   return (
@@ -49,7 +50,7 @@ const SortDropdown = ({ value, onChange }) => {
 // Search Input
 const SearchInput = ({ value, onChange }) => (
   <div className="relative">
-    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40">🔍</span>
+    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
     <input
       type="text"
       placeholder="Search by ID or address..."
@@ -63,22 +64,23 @@ const SearchInput = ({ value, onChange }) => (
 // Empty State Component
 const EmptyState = ({ filter }) => {
   const messages = {
-    all: { icon: '📭', title: 'No Streams Yet', subtitle: 'Create your first stream to get started' },
-    active: { icon: '⏸️', title: 'No Active Streams', subtitle: 'All streams are paused or completed' },
-    completed: { icon: '✅', title: 'No Completed Streams', subtitle: 'Completed streams will appear here' },
-    cancelled: { icon: '🚫', title: 'No Cancelled Streams', subtitle: 'Cancelled streams will appear here' },
+    all: { Icon: Inbox, title: 'No Streams Yet', subtitle: 'Create your first stream to get started' },
+    active: { Icon: Pause, title: 'No Active Streams', subtitle: 'All streams are paused or completed' },
+    completed: { Icon: CheckCircle, title: 'No Completed Streams', subtitle: 'Completed streams will appear here' },
+    cancelled: { Icon: Ban, title: 'No Cancelled Streams', subtitle: 'Cancelled streams will appear here' },
   };
 
   const msg = messages[filter] || messages.all;
+  const IconComponent = msg.Icon;
 
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
-      <div className="text-6xl mb-4 animate-float">{msg.icon}</div>
+      <IconComponent className="w-16 h-16 text-white/40 mb-4" />
       <h3 className="text-lg font-semibold text-white/80">{msg.title}</h3>
       <p className="text-sm text-white/50 mt-1">{msg.subtitle}</p>
       {filter === 'all' && (
-        <button className="btn-primary mt-6">
-          ➕ Create Stream
+        <button className="btn-primary mt-6 flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Create Stream
         </button>
       )}
     </div>
@@ -206,7 +208,7 @@ export default function StreamList({
           <h3 className="text-lg font-semibold text-white/90">{title}</h3>
           {isLoading && (
             <div className="flex items-center gap-1 text-xs text-white/50">
-              <span className="animate-spin">⟳</span> Loading...
+              <Loader2 className="w-3 h-3 animate-spin" /> Loading...
             </div>
           )}
         </div>

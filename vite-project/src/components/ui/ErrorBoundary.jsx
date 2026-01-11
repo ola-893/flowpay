@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { AlertTriangle, Wrench, RefreshCw, Inbox, Link, Wifi } from 'lucide-react';
 
 // Error Boundary Component
 export class ErrorBoundary extends Component {
@@ -49,27 +50,30 @@ export function ErrorFallback({ error, onRetry, variant = 'default' }) {
   const variants = {
     default: {
       container: 'card-glass p-6 md:p-8',
-      icon: '⚠️',
+      Icon: AlertTriangle,
       title: 'Something went wrong',
     },
     inline: {
       container: 'p-4 rounded-xl bg-error-500/10 border border-error-500/20',
-      icon: '⚠️',
+      Icon: AlertTriangle,
       title: 'Error loading content',
     },
     fullscreen: {
       container: 'min-h-[50vh] flex items-center justify-center',
-      icon: '🔧',
+      Icon: Wrench,
       title: 'Oops! Something broke',
     },
   };
 
   const config = variants[variant] || variants.default;
+  const IconComponent = config.Icon;
 
   return (
     <div className={config.container}>
       <div className={`text-center ${variant === 'fullscreen' ? 'max-w-md mx-auto' : ''}`}>
-        <div className="text-5xl mb-4 animate-float">{config.icon}</div>
+        <div className="flex justify-center mb-4">
+          <IconComponent className="w-12 h-12 text-warning-400" />
+        </div>
         <h3 className="text-lg font-semibold text-white mb-2">{config.title}</h3>
         <p className="text-sm text-white/60 mb-4">
           {error?.message || 'An unexpected error occurred. Please try again.'}
@@ -78,9 +82,9 @@ export function ErrorFallback({ error, onRetry, variant = 'default' }) {
         <div className="flex flex-col sm:flex-row gap-2 justify-center">
           <button
             onClick={onRetry}
-            className="btn-primary min-h-[44px] touch-manipulation"
+            className="btn-primary min-h-[44px] touch-manipulation flex items-center justify-center gap-2"
           >
-            🔄 Try Again
+            <RefreshCw className="w-4 h-4" /> Try Again
           </button>
           <button
             onClick={() => window.location.reload()}
@@ -108,7 +112,7 @@ export function ErrorFallback({ error, onRetry, variant = 'default' }) {
 
 // Empty State Component
 export function EmptyState({ 
-  icon = '📭', 
+  icon: IconComponent = Inbox, 
   title = 'No data', 
   subtitle = 'Nothing to display here yet',
   action,
@@ -116,15 +120,17 @@ export function EmptyState({
 }) {
   return (
     <div className={`flex flex-col items-center justify-center py-12 md:py-16 text-center ${className}`}>
-      <div className="text-5xl md:text-6xl mb-4 animate-float">{icon}</div>
+      <div className="flex justify-center mb-4">
+        <IconComponent className="w-12 h-12 md:w-16 md:h-16 text-white/40" />
+      </div>
       <h3 className="text-lg font-semibold text-white/80">{title}</h3>
       <p className="text-sm text-white/50 mt-1 max-w-xs">{subtitle}</p>
       {action && (
         <button
           onClick={action.onClick}
-          className="btn-primary mt-6 min-h-[44px] touch-manipulation"
+          className="btn-primary mt-6 min-h-[44px] touch-manipulation flex items-center gap-2"
         >
-          {action.icon && <span>{action.icon}</span>}
+          {action.icon && action.icon}
           {action.label}
         </button>
       )}
@@ -150,7 +156,7 @@ export function ConnectionError({ onRetry, className = '' }) {
   return (
     <div className={`card-glass p-6 ${className}`}>
       <div className="flex items-start gap-4">
-        <div className="text-3xl">📡</div>
+        <Wifi className="w-8 h-8 text-white/60" />
         <div className="flex-1">
           <h3 className="font-semibold text-white">Connection Lost</h3>
           <p className="text-sm text-white/60 mt-1">
@@ -158,9 +164,9 @@ export function ConnectionError({ onRetry, className = '' }) {
           </p>
           <button
             onClick={onRetry}
-            className="btn-outline mt-4 min-h-[44px] touch-manipulation"
+            className="btn-outline mt-4 min-h-[44px] touch-manipulation flex items-center gap-2"
           >
-            🔄 Reconnect
+            <RefreshCw className="w-4 h-4" /> Reconnect
           </button>
         </div>
       </div>
@@ -172,7 +178,9 @@ export function ConnectionError({ onRetry, className = '' }) {
 export function WalletNotConnected({ onConnect, className = '' }) {
   return (
     <div className={`flex flex-col items-center justify-center py-12 md:py-16 text-center ${className}`}>
-      <div className="text-5xl md:text-6xl mb-4 animate-float">🔗</div>
+      <div className="flex justify-center mb-4">
+        <Link className="w-12 h-12 md:w-16 md:h-16 text-white/40" />
+      </div>
       <h3 className="text-lg font-semibold text-white/80">Wallet Not Connected</h3>
       <p className="text-sm text-white/50 mt-1 max-w-xs">
         Connect your wallet to view and manage your streams
@@ -192,7 +200,7 @@ export function NetworkMismatch({ expectedNetwork, onSwitch, className = '' }) {
   return (
     <div className={`card-glass p-6 border-warning-500/30 ${className}`}>
       <div className="flex items-start gap-4">
-        <div className="text-3xl">⚠️</div>
+        <AlertTriangle className="w-8 h-8 text-warning-400" />
         <div className="flex-1">
           <h3 className="font-semibold text-warning-400">Wrong Network</h3>
           <p className="text-sm text-white/60 mt-1">

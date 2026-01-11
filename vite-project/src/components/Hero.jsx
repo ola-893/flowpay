@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowRightLeft, Bot, Zap, BookOpen } from 'lucide-react';
 
 // Animated Counter Component
 const AnimatedCounter = ({ end, duration = 2000, prefix = '', suffix = '' }) => {
@@ -58,7 +59,7 @@ const Typewriter = ({ text, speed = 50, delay = 500 }) => {
 };
 
 // Floating Metric Card
-const FloatingCard = ({ icon, label, value, delay = 0, color = 'flowpay' }) => {
+const FloatingCard = ({ icon: Icon, label, value, delay = 0, color = 'flowpay' }) => {
   const colors = {
     flowpay: 'from-flowpay-500/20 to-flowpay-600/10 border-flowpay-500/30',
     accent: 'from-accent-500/20 to-accent-600/10 border-accent-500/30',
@@ -76,7 +77,7 @@ const FloatingCard = ({ icon, label, value, delay = 0, color = 'flowpay' }) => {
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-center gap-3">
-        <span className="text-2xl">{icon}</span>
+        <Icon className="w-6 h-6 text-white/80" />
         <div>
           <div className="text-lg font-bold text-white">{value}</div>
           <div className="text-xs text-white/60">{label}</div>
@@ -227,7 +228,7 @@ export default function Hero({ networkName = 'Ethereum Sepolia', stats }) {
               to="/docs"
               className="btn-outline text-lg px-8 py-4 hover-scale inline-flex items-center gap-2"
             >
-              📖 Read Docs
+              <BookOpen className="w-5 h-5" /> Read Docs
             </Link>
             <a 
               href="https://github.com/your-org/flowpay" 
@@ -247,21 +248,21 @@ export default function Hero({ networkName = 'Ethereum Sepolia', stats }) {
           {/* Floating Metric Cards - Desktop */}
           <div className="hidden lg:flex absolute top-12 right-12 flex-col gap-4">
             <FloatingCard
-              icon="💸"
+              icon={ArrowRightLeft}
               label="Streams/sec"
               value="2.4k"
               delay={0}
               color="flowpay"
             />
             <FloatingCard
-              icon="🤖"
+              icon={Bot}
               label="AI Agents"
               value="156"
               delay={200}
               color="accent"
             />
             <FloatingCard
-              icon="⚡"
+              icon={Zap}
               label="Gas Saved"
               value="95%"
               delay={400}

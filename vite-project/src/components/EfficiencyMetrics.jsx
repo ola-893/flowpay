@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { TrendingUp, User, Bot, Fuel } from 'lucide-react';
 
 // Animated Counter for savings
 const AnimatedCounter = ({ value, prefix = '', suffix = '', decimals = 0 }) => {
@@ -80,7 +81,9 @@ const NPlusOneVisualizer = () => {
                 <div className="flex flex-col items-center justify-center space-y-6">
                     <div className="text-xs font-bold text-white/60 uppercase">Traditional N+1</div>
                     <div className="relative w-full flex justify-center">
-                        <div className="w-12 h-12 rounded-xl bg-surface-600 flex items-center justify-center text-xl">👤</div>
+                        <div className="w-12 h-12 rounded-xl bg-surface-600 flex items-center justify-center">
+                            <User className="w-6 h-6 text-white/80" />
+                        </div>
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full">
                             {[...Array(5)].map((_, i) => (
                                 <div
@@ -110,7 +113,9 @@ const NPlusOneVisualizer = () => {
                 <div className="flex flex-col items-center justify-center space-y-6 border-l border-white/5 pl-8">
                     <div className="text-xs font-bold text-flowpay-400 uppercase">FlowPay Solution</div>
                     <div className="relative">
-                        <div className="w-12 h-12 rounded-xl bg-flowpay-500 flex items-center justify-center text-xl shadow-glow">🤖</div>
+                        <div className="w-12 h-12 rounded-xl bg-flowpay-500 flex items-center justify-center shadow-glow">
+                            <Bot className="w-6 h-6 text-white" />
+                        </div>
                         <div className="absolute -inset-4 rounded-2xl border border-flowpay-500/30 animate-pulse-glow" />
                     </div>
                     <div className="w-full h-8 bg-surface-700 rounded-lg relative overflow-hidden flex items-center justify-center">
@@ -156,7 +161,7 @@ export function EfficiencyMetrics({ metrics }) {
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    📈 Efficiency & Performance
+                    <TrendingUp className="w-5 h-5" /> Efficiency & Performance
                 </h2>
                 <div className="flex gap-2">
                     {['24h', '7d', '30d'].map(tf => (
@@ -197,7 +202,7 @@ export function EfficiencyMetrics({ metrics }) {
                 <div className="space-y-6">
                     <div className="card-glass p-6">
                         <h3 className="text-sm font-semibold text-white/80 mb-6 flex items-center gap-2">
-                            ⛽ Gas Cost Comparison
+                            <Fuel className="w-4 h-4" /> Gas Cost Comparison
                         </h3>
                         <BarChart
                             groups={gasComparison.groups}
