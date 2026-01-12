@@ -77,7 +77,11 @@ That's it! The contracts are already deployed on Sepolia - no deployment needed.
 
 ### Environment Variables (Optional)
 
-Create `.env` in the root directory for custom deployments:
+Copy `.env.example` to `.env` and fill in your values:
+
+```bash
+cp .env.example .env
+```
 
 ```env
 # Only needed if deploying your own contracts
