@@ -181,7 +181,7 @@ Simply visit the FlowPay dashboard and connect your wallet. No downloads or inst
 ### Clone the Repository
 
 \`\`\`bash
-git clone https://github.com/your-org/flowpay
+git clone https://github.com/ola-893/flowpay
 cd flowpay
 \`\`\`
 
@@ -1157,7 +1157,7 @@ const Sidebar = ({ activeSection, onSectionChange, isOpen, onClose }) => {
         {/* Footer */}
         <div className="p-4 border-t border-white/10 mt-auto">
           <a 
-            href="https://github.com/your-org/flowpay" 
+            href="https://github.com/ola-893/flowpay" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
@@ -1245,7 +1245,7 @@ export default function Docs() {
             </div>
             <div className="flex items-center gap-4">
               <a 
-                href="https://github.com/your-org/flowpay" 
+                href="https://github.com/ola-893/flowpay" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-white/60 hover:text-white transition-colors"

@@ -231,7 +231,7 @@ export default function Hero({ networkName = 'Ethereum Sepolia', stats }) {
               <BookOpen className="w-5 h-5" /> Read Docs
             </Link>
             <a 
-              href="https://github.com/your-org/flowpay" 
+              href="https://github.com/ola-893/flowpay" 
               target="_blank" 
               rel="noopener noreferrer"
               className="btn-ghost text-lg px-6 py-4"

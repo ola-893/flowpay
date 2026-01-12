@@ -306,138 +306,112 @@ Consumer Agent                Provider API                FlowPay Contract
 
 ---
 
-## 🏁 Getting Started
+## 🏁 Quick Start (5 Minutes)
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18+
-- [MetaMask](https://metamask.io/) configured for Ethereum Sepolia
-- Sepolia ETH for gas (get from [faucet](https://sepoliafaucet.com/))
-- MNEE tokens (testnet version)
-- Google Gemini API key (optional, for AI features)
+- [MetaMask](https://metamask.io/) browser extension
 
-### 1. Clone & Install
+### Step 1: Clone & Install
 
 ```bash
 git clone https://github.com/ola-893/flowpay.git
 cd flowpay
-
-# Install root dependencies
-npm install
-
-# Install frontend dependencies
-cd vite-project
-npm install
+npm run install:all
 ```
 
-### 2. Environment Setup
+### Step 2: Run the App
 
-Create `.env` in the root directory:
-
-```env
-# Network Configuration
-SEPOLIA_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY"
-PRIVATE_KEY="YOUR_DEPLOYER_PRIVATE_KEY"
-
-# MNEE Token (Mainnet reference, testnet uses mock)
-MNEE_CONTRACT="0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF"
-
-# AI Integration (Optional)
-GEMINI_API_KEY="your_gemini_api_key"
+```bash
+npm run dev
 ```
 
-### 3. Deployed Contracts (Sepolia Testnet)
+Open http://localhost:5173 in your browser.
 
-The contracts are already deployed on Sepolia:
+### Step 3: Connect & Test
+
+1. **Add Sepolia to MetaMask** (if not already added):
+   - Network: Sepolia
+   - RPC: `https://sepolia.infura.io/v3/YOUR_KEY` or use MetaMask's default
+   - Chain ID: `11155111`
+
+2. **Get Sepolia ETH** for gas fees:
+   - [Sepolia Faucet](https://sepoliafaucet.com/)
+   - [Alchemy Faucet](https://sepoliafaucet.com/)
+
+3. **Connect wallet** and click "Mint MNEE" to get free test tokens
+
+4. **Create a stream** and watch payments flow in real-time!
+
+That's it! The contracts are already deployed on Sepolia - no deployment needed.
+
+---
+
+## 📋 Deployed Contracts (Sepolia)
 
 | Contract | Address |
 |----------|---------|
 | FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
 
-To deploy your own:
+---
+
+## 🔧 Advanced Setup
+
+### Environment Variables (Optional)
+
+Create `.env` in the root directory for custom deployments:
+
+```env
+# Only needed if deploying your own contracts
+SEPOLIA_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY"
+PRIVATE_KEY="YOUR_DEPLOYER_PRIVATE_KEY"
+
+# AI Features (Optional)
+GEMINI_API_KEY="your_gemini_api_key"
+```
+
+### Deploy Your Own Contracts
 
 ```bash
-# Deploy FlowPay contract to Sepolia
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
-### Switching from Mock MNEE to Mainnet MNEE
+### Run Tests
 
-The project uses a `MockMNEE` ERC-20 token for testnet development. When deploying to mainnet or using the real MNEE stablecoin, follow these steps:
+```bash
+npm test                    # Run all tests
+npm run test:contracts      # Smart contract tests only
+npm run test:sdk           # SDK tests only
+```
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start frontend dev server |
+| `npm run build:web` | Build for production |
+| `npm run test` | Run all tests |
+| `npm run deploy:sepolia` | Deploy contracts to Sepolia |
+| `npm run demo:provider` | Run provider demo |
+| `npm run demo:consumer` | Run consumer demo |
+
+---
+
+## 🔄 Mainnet Migration
+
+When ready for production with real MNEE:
+
+| Feature | Testnet (Sepolia) | Mainnet |
+|---------|-------------------|---------|
+| Token | MockMNEE (free mint) | Real MNEE |
+| Network | Sepolia (11155111) | Ethereum (1) |
+| Gas | Free testnet ETH | Real ETH |
 
 **MNEE Mainnet Contract:** `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`
 
-#### Key Differences
-
-| Feature | MockMNEE (Testnet) | MNEE (Mainnet) |
-|---------|-------------------|----------------|
-| Free minting | ✅ Yes | ❌ No |
-| Real value | ❌ No | ✅ Yes |
-| Gas costs | Free (testnet ETH) | Real ETH required |
-| Network | Sepolia | Ethereum Mainnet |
-
-#### Migration Steps
-
-1. **Update the frontend token address** (`vite-project/src/contactInfo.js`):
-   ```javascript
-   // Change from testnet MockMNEE
-   export const mneeTokenAddress = '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896';
-
-   // To mainnet MNEE
-   export const mneeTokenAddress = '0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF';
-   ```
-
-2. **Update the network configuration** to target Ethereum Mainnet (Chain ID: 1) instead of Sepolia (Chain ID: 11155111)
-
-3. **Deploy FlowPayStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
-
-4. **Remove the Mint button** - Real MNEE cannot be freely minted like the test token. Update the UI to hide/remove the mint functionality.
-
-5. **Update environment variables** (`.env`):
-   ```env
-   # Use mainnet MNEE instead of mock
-   MNEE_CONTRACT=0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF
-   ```
-
-6. **Update the deployment script** (`scripts/deploy.js`):
-   ```javascript
-   // Replace MockMNEE deployment with mainnet address
-   const MNEE_MAINNET = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
-   
-   // Skip MockMNEE deployment, use mainnet address directly
-   const flowPayStream = await FlowPayStream.deploy(MNEE_MAINNET);
-   ```
-
-#### Acquiring Real MNEE
-
-On mainnet, you'll need to acquire MNEE tokens through:
-- Supported exchanges
-- Token swaps (Uniswap, etc.)
-- Direct purchase
-
-Check the official MNEE documentation for current acquisition methods.
-
-> **⚠️ Important:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `FlowPayStream.sol` — it already uses the `IERC20` interface. Always test thoroughly on Sepolia before deploying to mainnet. Mainnet transactions use real funds and cannot be reversed.
-
-### 4. Configure Frontend
-
-Update `vite-project/src/contractInfo.js`:
-
-```javascript
-export const contractAddress = "YOUR_DEPLOYED_CONTRACT_ADDRESS";
-export const mneeAddress = "MNEE_TOKEN_ADDRESS";
-export const contractABI = [ /* ABI from deployment */ ];
-```
-
-### 5. Run the Application
-
-```bash
-cd vite-project
-npm run dev
-```
-
-Visit `http://localhost:5173` and connect MetaMask to Sepolia.
+Update `vite-project/src/contactInfo.js` with mainnet addresses and deploy FlowPayStream to mainnet.
 
 ---
 
