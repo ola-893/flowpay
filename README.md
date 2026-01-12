@@ -16,7 +16,7 @@ FlowPay combines **x402's HTTP-native service discovery** with **continuous paym
 | Resource | Link |
 |----------|------|
 | **Live dApp** | https://flowpay-dashboard.netlify.app |
-| **Demo Video** | `[Add your demo video link here]` |
+| **Demo Video** | [Watch on YouTube](https://youtu.be/d2uZi4Agi1o?si=MKlDp4BQpHHnh5d6) |
 | **GitHub Repo** | https://github.com/ola-893/flowpay |
 | **MNEE Contract (Mainnet)** | `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF` |
 
