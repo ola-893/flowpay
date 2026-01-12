@@ -20,11 +20,98 @@ FlowPay combines **x402's HTTP-native service discovery** with **continuous paym
 | **GitHub Repo** | https://github.com/ola-893/flowpay |
 | **MNEE Contract (Mainnet)** | `0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF` |
 
-### Test Credentials
-No login required! Simply:
-1. Connect MetaMask wallet to Sepolia testnet
-2. Mint free test MNEE tokens from the dashboard
-3. Create streams and test the full flow
+---
+
+## 🏁 Quick Start (5 Minutes)
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org/) v18+
+- [MetaMask](https://metamask.io/) browser extension
+
+### Step 1: Clone & Install
+
+```bash
+git clone https://github.com/ola-893/flowpay.git
+cd flowpay
+npm run install:all
+```
+
+### Step 2: Run the App
+
+```bash
+npm run dev
+```
+
+Open http://localhost:5173 in your browser.
+
+### Step 3: Connect & Test
+
+1. **Add Sepolia to MetaMask** (if not already added):
+   - Network: Sepolia
+   - RPC: `https://sepolia.infura.io/v3/YOUR_KEY` or use MetaMask's default
+   - Chain ID: `11155111`
+
+2. **Get Sepolia ETH** for gas fees:
+   - [Sepolia Faucet](https://sepoliafaucet.com/)
+   - [Alchemy Faucet](https://sepoliafaucet.com/)
+
+3. **Connect wallet** and click "Mint MNEE" to get free test tokens
+
+4. **Create a stream** and watch payments flow in real-time!
+
+That's it! The contracts are already deployed on Sepolia - no deployment needed.
+
+---
+
+## 📋 Deployed Contracts (Sepolia)
+
+| Contract | Address |
+|----------|---------|
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
+
+---
+
+## �  Advanced Setup
+
+### Environment Variables (Optional)
+
+Create `.env` in the root directory for custom deployments:
+
+```env
+# Only needed if deploying your own contracts
+SEPOLIA_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY"
+PRIVATE_KEY="YOUR_DEPLOYER_PRIVATE_KEY"
+
+# AI Features (Optional)
+GEMINI_API_KEY="your_gemini_api_key"
+```
+
+### Deploy Your Own Contracts
+
+```bash
+npx hardhat run scripts/deploy.js --network sepolia
+```
+
+### Run Tests
+
+```bash
+npm test                    # Run all tests
+npm run test:contracts      # Smart contract tests only
+npm run test:sdk           # SDK tests only
+```
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start frontend dev server |
+| `npm run build:web` | Build for production |
+| `npm run test` | Run all tests |
+| `npm run deploy:sepolia` | Deploy contracts to Sepolia |
+| `npm run demo:provider` | Run provider demo |
+| `npm run demo:consumer` | Run consumer demo |
 
 ---
 
@@ -306,99 +393,6 @@ Consumer Agent                Provider API                FlowPay Contract
 
 ---
 
-## 🏁 Quick Start (5 Minutes)
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) v18+
-- [MetaMask](https://metamask.io/) browser extension
-
-### Step 1: Clone & Install
-
-```bash
-git clone https://github.com/ola-893/flowpay.git
-cd flowpay
-npm run install:all
-```
-
-### Step 2: Run the App
-
-```bash
-npm run dev
-```
-
-Open http://localhost:5173 in your browser.
-
-### Step 3: Connect & Test
-
-1. **Add Sepolia to MetaMask** (if not already added):
-   - Network: Sepolia
-   - RPC: `https://sepolia.infura.io/v3/YOUR_KEY` or use MetaMask's default
-   - Chain ID: `11155111`
-
-2. **Get Sepolia ETH** for gas fees:
-   - [Sepolia Faucet](https://sepoliafaucet.com/)
-   - [Alchemy Faucet](https://sepoliafaucet.com/)
-
-3. **Connect wallet** and click "Mint MNEE" to get free test tokens
-
-4. **Create a stream** and watch payments flow in real-time!
-
-That's it! The contracts are already deployed on Sepolia - no deployment needed.
-
----
-
-## 📋 Deployed Contracts (Sepolia)
-
-| Contract | Address |
-|----------|---------|
-| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
-| MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
-
----
-
-## 🔧 Advanced Setup
-
-### Environment Variables (Optional)
-
-Create `.env` in the root directory for custom deployments:
-
-```env
-# Only needed if deploying your own contracts
-SEPOLIA_RPC_URL="https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY"
-PRIVATE_KEY="YOUR_DEPLOYER_PRIVATE_KEY"
-
-# AI Features (Optional)
-GEMINI_API_KEY="your_gemini_api_key"
-```
-
-### Deploy Your Own Contracts
-
-```bash
-npx hardhat run scripts/deploy.js --network sepolia
-```
-
-### Run Tests
-
-```bash
-npm test                    # Run all tests
-npm run test:contracts      # Smart contract tests only
-npm run test:sdk           # SDK tests only
-```
-
-### Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start frontend dev server |
-| `npm run build:web` | Build for production |
-| `npm run test` | Run all tests |
-| `npm run deploy:sepolia` | Deploy contracts to Sepolia |
-| `npm run demo:provider` | Run provider demo |
-| `npm run demo:consumer` | Run consumer demo |
-
----
-
 ## 🔄 Mainnet Migration
 
 When ready for production with real MNEE:
@@ -477,39 +471,6 @@ console.log(response);
 7. Alice cancels stream when done, gets unused deposit back
 
 **All payments happen automatically, no human intervention!**
-
----
-
-## 🎬 Demo Video Script
-
-```
-[0:00-0:30] Opening
-- Show real-time counter incrementing
-- "Watch this number. It's money flowing between AI agents."
-
-[0:30-1:30] The Problem
-- Traditional payments: expensive, slow, require humans
-- AI agents need micropayments at scale
-
-[1:30-2:30] The Solution
-- Create stream with MNEE
-- Show approval + stream creation
-- Counter starts: $0.001... $0.002... $0.003...
-
-[2:30-3:30] Agent Demo
-- Split screen: Agent A calling API, Agent B serving
-- Stream balance increasing in real-time
-- Bob clicks withdraw, MNEE arrives instantly
-
-[3:30-4:30] AI Intelligence
-- Show Gemini analyzing spending
-- AI decides to cancel low-value stream
-- Budget optimization in action
-
-[4:30-5:00] Closing
-- Network stats: active streams, volume
-- "FlowPay: Where AI agents don't just pay—they think."
-```
 
 ---
 
