@@ -6,14 +6,20 @@ coverage/
 typechain/
 hardhat.cache
 .env
-.env.*
+.env.local
+.env.development
+.env.production
+!.env.example
 ignition/deployments/
 
 # Frontend
 vite-project/node_modules/
 vite-project/dist/
 vite-project/.env
-vite-project/.env.*
+vite-project/.env.local
+vite-project/.env.development
+vite-project/.env.production
+!vite-project/.env.example
 vite-project/.vite/
 
 # OS / editors
