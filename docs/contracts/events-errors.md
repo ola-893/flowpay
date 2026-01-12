@@ -1,6 +1,6 @@
 # Events & Errors
 
-Reference for MorphStream contract events and error messages.
+Reference for FlowPayStream contract events and error messages.
 
 ## Events
 
@@ -95,29 +95,29 @@ event StreamCancelled(
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `MorphStream: Total amount must be greater than 0.` | Amount is zero | Provide positive amount |
-| `MorphStream: Recipient cannot be the zero address.` | Invalid recipient | Use valid address |
-| `MorphStream: Duration must be greater than 0.` | Duration is zero | Provide positive duration |
-| `MorphStream: flowRate would be zero.` | Amount too small for duration | Increase amount or decrease duration |
-| `MorphStream: Transfer failed. check allowance` | Insufficient approval | Approve tokens first |
+| `FlowPayStream: Total amount must be greater than 0.` | Amount is zero | Provide positive amount |
+| `FlowPayStream: Recipient cannot be the zero address.` | Invalid recipient | Use valid address |
+| `FlowPayStream: Duration must be greater than 0.` | Duration is zero | Provide positive duration |
+| `FlowPayStream: flowRate would be zero.` | Amount too small for duration | Increase amount or decrease duration |
+| `FlowPayStream: Transfer failed. check allowance` | Insufficient approval | Approve tokens first |
 
 ### Withdrawal Errors
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `MorphStream: Stream is not active.` | Stream ended or cancelled | Check stream status |
-| `MorphStream: Caller is not the recipient.` | Wrong caller | Use recipient wallet |
-| `MorphStream: No funds to withdraw.` | Nothing claimable yet | Wait for funds to stream |
-| `MorphStream: Transfer failed.` | Token transfer issue | Check contract balance |
+| `FlowPayStream: Stream is not active.` | Stream ended or cancelled | Check stream status |
+| `FlowPayStream: Caller is not the recipient.` | Wrong caller | Use recipient wallet |
+| `FlowPayStream: No funds to withdraw.` | Nothing claimable yet | Wait for funds to stream |
+| `FlowPayStream: Transfer failed.` | Token transfer issue | Check contract balance |
 
 ### Cancellation Errors
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `MorphStream: Stream already cancelled.` | Already inactive | No action needed |
-| `MorphStream: Caller cannot cancel this stream.` | Not sender or recipient | Use authorized wallet |
-| `MorphStream: Recipient transfer failed on cancel.` | Transfer issue | Check token state |
-| `MorphStream: Sender refund failed on cancel.` | Transfer issue | Check token state |
+| `FlowPayStream: Stream already cancelled.` | Already inactive | No action needed |
+| `FlowPayStream: Caller cannot cancel this stream.` | Not sender or recipient | Use authorized wallet |
+| `FlowPayStream: Recipient transfer failed on cancel.` | Transfer issue | Check token state |
+| `FlowPayStream: Sender refund failed on cancel.` | Transfer issue | Check token state |
 
 ## Listening to Events
 

@@ -16,7 +16,7 @@ FlowPay can be deployed to various Ethereum networks.
 | Contract | Address |
 |----------|---------|
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
-| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 
 ## Deployment Guides
 
@@ -41,7 +41,7 @@ npx hardhat run scripts/deploy.js --network sepolia
 ├─────────────────────────────────────────┤
 │                                         │
 │  ┌─────────────┐  ┌─────────────────┐   │
-│  │  MockMNEE   │  │  MorphStream    │   │
+│  │  MockMNEE   │  │  FlowPayStream  │   │
 │  │  (ERC-20)   │──│  (Streaming)    │   │
 │  └─────────────┘  └─────────────────┘   │
 │         │                 │             │

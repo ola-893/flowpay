@@ -2,14 +2,14 @@
 
 ## Overview
 
-Transform the existing MorphStream project into FlowPay - "The Streaming Extension for x402." The system uses x402 as the "Menu" (service discovery via HTTP 402) and Payment Streams as the "Tab" (efficient continuous payment). This solves the N+1 Signature Problem where standard x402 requires a signature per request.
+Transform the existing FlowPayStream project into FlowPay - "The Streaming Extension for x402." The system uses x402 as the "Menu" (service discovery via HTTP 402) and Payment Streams as the "Tab" (efficient continuous payment). This solves the N+1 Signature Problem where standard x402 requires a signature per request.
 
 **Key Innovation**: 2 on-chain transactions (Open + Close) regardless of request volume.
 
 ## Tasks
 
 - [x] 1. Smart Contract Migration to MNEE
-  - Modify existing MorphStream contract to use MNEE tokens instead of ETH
+  - Modify existing FlowPayStream contract to use MNEE tokens instead of ETH
   - Add MNEE token interface and approval mechanisms
   - Implement metadata storage for agent identification
   - Add `isStreamActive()` function for middleware verification
@@ -19,7 +19,7 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
 - [x]* 1.1 Write property test for MNEE token operations
   - **Property 1: MNEE Token Stream Operations**
   - **Validates: Requirements 1.1, 1.2, 1.3, 1.5**
-  - Tests exist in `test/MorphStream.test.js` (MNEE token integration tests)
+  - Tests exist in `test/FlowPayStream.test.js` (MNEE token integration tests)
 
 - [x] 2. Network Configuration Update
   - Update hardhat config for Ethereum Sepolia deployment
@@ -178,7 +178,7 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
   - Tests exist in `sdk/test/metadata.test.ts`
 
 - [x] 13. Enhanced Web Dashboard
-  - [x] 13.1 Rebrand from MorphStream to FlowPay
+  - [x] 13.1 Rebrand from FlowPayStream to FlowPay
     - Update Header component with FlowPay branding
     - Update Hero component with FlowPay messaging and x402 description
     - Update page title and meta information
@@ -256,7 +256,7 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
 - [x] 16. Final Integration and Testing
   - [x] 16.1 Deploy complete system to Sepolia testnet
     - Deploy MockMNEE contract to Sepolia
-    - Deploy MorphStream contract to Sepolia
+    - Deploy FlowPayStream contract to Sepolia
     - Update frontend with deployed contract addresses
     - _Requirements: 2.1, 2.6_
     - Hardhat config ready; deploy script exists at `scripts/deploy.js`
@@ -487,13 +487,13 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
 ## Frontend-Backend Integration Tasks
 
 - [ ] 29. Smart Contract Deployment & Configuration
-  - [ ] 29.1 Deploy MockMNEE and MorphStream contracts to Sepolia
+  - [ ] 29.1 Deploy MockMNEE and FlowPayStream contracts to Sepolia
     - Run `npx hardhat run scripts/deploy.js --network sepolia`
     - Record deployed contract addresses
     - Verify contracts on Etherscan
     - _Requirements: 1.4, 2.1, 2.6_
   - [ ] 29.2 Configure Netlify environment variables
-    - Set VITE_CONTRACT_ADDRESS with MorphStream address
+    - Set VITE_CONTRACT_ADDRESS with FlowPayStream address
     - Set VITE_MNEE_TOKEN_ADDRESS with MockMNEE address
     - Redeploy frontend with new environment variables
     - _Requirements: 2.1, 2.6_
@@ -519,7 +519,7 @@ Transform the existing MorphStream project into FlowPay - "The Streaming Extensi
 - [ ] 31. Stream Creation Integration
   - [ ] 31.1 Connect CreateStreamForm to smart contract
     - Implement MNEE token approval before stream creation
-    - Call MorphStream.createStream() with form data
+    - Call FlowPayStream.createStream() with form data
     - Handle transaction pending/success/error states
     - Show transaction hash and Etherscan link
     - _Requirements: 1.1, 1.2, 3.1_

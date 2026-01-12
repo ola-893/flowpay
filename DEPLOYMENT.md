@@ -28,7 +28,8 @@ ETHERSCAN_API_KEY=...                # For contract verification
 GEMINI_API_KEY=...                   # For AI features
 
 # Frontend (vite-project/.env)
-VITE_CONTRACT_ADDRESS=0x...          # MorphStream contract address (after deployment)
+VITE_CONTRACT_ADDRESS=0x...          # FlowPayStream contract address (after deployment)
+VITE_MNEE_TOKEN_ADDRESS=0x...        # MockMNEE address (after deployment)
 VITE_MNEE_TOKEN_ADDRESS=0x...        # MockMNEE address (after deployment)
 ```
 
@@ -61,15 +62,15 @@ npx hardhat run scripts/deploy.js --network sepolia
 Deploying contracts with the account: 0x...
 Deploying MockMNEE...
 MockMNEE deployed to: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
-Deploying MorphStream with MNEE address: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
-MorphStream deployed to: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
+Deploying FlowPayStream with MNEE address: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
+FlowPayStream deployed to: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
 ```
 
 **Current Sepolia Deployment (January 2026):**
 | Contract | Address |
 |----------|---------|
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
-| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 
 **Save these addresses!** You'll need them for configuration.
 
@@ -79,7 +80,7 @@ After deployment, update these files:
 
 **`vite-project/.env`:**
 ```bash
-VITE_CONTRACT_ADDRESS=0x5678...      # MorphStream address
+VITE_CONTRACT_ADDRESS=0x5678...      # FlowPayStream address
 VITE_MNEE_TOKEN_ADDRESS=0x1234...    # MockMNEE address
 ```
 
@@ -140,7 +141,7 @@ npx mocha -r ts-node/register test/*.test.ts
 
 ### Smart Contract Tests (6 tests)
 ```bash
-npx hardhat test test/MorphStream.test.js
+npx hardhat test test/FlowPayStream.test.js
 ```
 
 ### Integration Tests Only
@@ -215,7 +216,7 @@ npx mocha -r ts-node/register test/load.test.ts
 
 | Component | Description | Location |
 |-----------|-------------|----------|
-| MorphStream | Smart contract for payment streams | `contracts/MorphStream.sol` |
+| FlowPayStream | Smart contract for payment streams | `contracts/FlowPayStream.sol` |
 | MockMNEE | Test ERC-20 token | `contracts/MockMNEE.sol` |
 | FlowPaySDK | Agent SDK for x402 negotiation | `sdk/src/FlowPaySDK.ts` |
 | flowPayMiddleware | Express.js x402 middleware | `server/middleware/flowPayMiddleware.js` |
@@ -228,7 +229,6 @@ npx mocha -r ts-node/register test/load.test.ts
 | Network | Chain ID | RPC URL |
 |---------|----------|---------|
 | Sepolia | 11155111 | https://rpc.sepolia.org |
-| Morph Holesky | 2810 | https://rpc-testnet.morphl2.io |
 
 ## Troubleshooting
 
@@ -237,7 +237,7 @@ npx mocha -r ts-node/register test/load.test.ts
 
 ### "MNEE transfer failed"
 - Ensure MockMNEE is deployed
-- Check token approval: `mnee.approve(morphStreamAddress, amount)`
+- Check token approval: `mnee.approve(flowPayStreamAddress, amount)`
 
 ### "Stream is not active"
 - Verify stream ID exists on-chain

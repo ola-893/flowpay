@@ -37,7 +37,7 @@ FlowPay consists of three main components:
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │                       │                       │
         ▼                       ▼                       ▼
-   FlowPaySDK            Middleware              MorphStream
+   FlowPaySDK            Middleware              FlowPayStream
    GeminiAI              Verification            MockMNEE
 ```
 

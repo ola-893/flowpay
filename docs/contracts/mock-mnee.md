@@ -70,9 +70,9 @@ console.log('Balance:', ethers.formatEther(balance), 'MNEE');
 ### Approve Spending
 
 ```javascript
-// Approve MorphStream to spend 100 MNEE
+// Approve FlowPayStream to spend 100 MNEE
 await mnee.approve(
-  morphStreamAddress,
+  flowPayStreamAddress,
   ethers.parseEther('100')
 );
 ```

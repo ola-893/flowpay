@@ -225,7 +225,7 @@ function AppContent() {
       }
       const code = await provider.getCode(contractAddress);
       if (!code || code === '0x') {
-        setStatus('Contract not deployed on this network. Switch to Morph Holesky.');
+        setStatus('Contract not deployed on this network. Switch to Sepolia.');
         return;
       }
       setStatus('Approving MNEE...');

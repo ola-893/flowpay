@@ -11,7 +11,7 @@ dotenv.config();
 const flowPayMiddleware = require('../server/middleware/flowPayMiddleware');
 
 // Contract addresses on Sepolia
-const MORPHSTREAM_ADDRESS = '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035';
+const FLOWPAYSTREAM_ADDRESS = '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035';
 const MOCK_MNEE_ADDRESS = '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896';
 // Use a more reliable RPC endpoint
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
@@ -33,7 +33,7 @@ app.use(express.json());
 // Real blockchain configuration for Sepolia
 const config = {
     mneeAddress: MOCK_MNEE_ADDRESS,
-    flowPayContractAddress: MORPHSTREAM_ADDRESS,
+    flowPayContractAddress: FLOWPAYSTREAM_ADDRESS,
     rpcUrl: SEPOLIA_RPC_URL,
     routes: {
         '/api/premium': {
@@ -48,7 +48,7 @@ const config = {
 };
 
 console.log("🔧 Provider Configuration:");
-console.log(`   MorphStream Contract: ${MORPHSTREAM_ADDRESS}`);
+console.log(`   FlowPayStream Contract: ${FLOWPAYSTREAM_ADDRESS}`);
 console.log(`   MNEE Token: ${MOCK_MNEE_ADDRESS}`);
 console.log(`   RPC URL: ${SEPOLIA_RPC_URL}`);
 
@@ -99,7 +99,7 @@ app.get('/api/info', (req, res) => {
         version: "1.0.0",
         network: "Sepolia Testnet",
         contracts: {
-            morphStream: MORPHSTREAM_ADDRESS,
+            flowPayStream: FLOWPAYSTREAM_ADDRESS,
             mneeToken: MOCK_MNEE_ADDRESS
         },
         protectedRoutes: [

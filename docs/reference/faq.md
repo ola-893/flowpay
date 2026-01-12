@@ -101,7 +101,7 @@ You need Sepolia ETH for gas fees. Get free testnet ETH from:
 ### "MNEE transfer failed"
 
 1. Check you have enough MNEE balance
-2. Ensure you've approved the MorphStream contract to spend your tokens
+2. Ensure you've approved the FlowPayStream contract to spend your tokens
 3. Verify the contract addresses are correct
 
 ### "Stream is not active"

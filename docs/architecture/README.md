@@ -18,7 +18,7 @@ FlowPay is designed as a modular, extensible payment protocol for AI agents.
 │         │                   │                   │                   │
 │         ▼                   ▼                   ▼                   │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐          │
-│  │   Gemini     │    │  Dashboard   │    │  MorphStream │          │
+│  │   Gemini     │    │  Dashboard   │    │ FlowPayStream│          │
 │  │   AI Brain   │    │   (React)    │    │  + MockMNEE  │          │
 │  └──────────────┘    └──────────────┘    └──────────────┘          │
 │                                                                      │
@@ -46,7 +46,7 @@ The x402 middleware enables API providers to:
 ### 3. Smart Contracts
 
 On-chain components:
-- **MorphStream**: Payment streaming contract
+- **FlowPayStream**: Payment streaming contract
 - **MockMNEE**: Test ERC-20 token
 
 ### 4. AI Decision Engine

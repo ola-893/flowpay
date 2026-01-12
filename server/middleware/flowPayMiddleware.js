@@ -5,7 +5,7 @@ const { ethers } = require('ethers');
  * @param {Object} config Middleware configuration
  * @param {Object} config.routes Map of routes to pricing config
  * @param {string} config.mneeAddress MNEE Token Address
- * @param {string} config.flowPayContractAddress MorphStream Contract Address
+ * @param {string} config.flowPayContractAddress FlowPayStream Contract Address
  * @param {string} config.rpcUrl RPC URL for blockchain connection
  * @param {string} config.apiKey Optional API Key for authentication
  * @param {string} config.privateKey Optional private key for server-side signing if needed (not used for verification)

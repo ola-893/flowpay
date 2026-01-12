@@ -72,7 +72,7 @@ X-FlowPay-Timestamp: 1704067200
 | `X-Payment-Amount` | Yes | Price per request |
 | `X-Payment-Currency` | Yes | Token symbol (MNEE) |
 | `X-Payment-Recipient` | Yes | Provider's address |
-| `X-Payment-Contract` | Yes | MorphStream contract |
+| `X-Payment-Contract` | Yes | FlowPayStream contract |
 | `X-Payment-Network` | Yes | Network name |
 | `X-Payment-Description` | No | Human-readable description |
 | `X-Payment-Min-Duration` | No | Minimum stream duration |

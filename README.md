@@ -352,7 +352,7 @@ The contracts are already deployed on Sepolia:
 
 | Contract | Address |
 |----------|---------|
-| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
 
 To deploy your own:
@@ -390,7 +390,7 @@ The project uses a `MockMNEE` ERC-20 token for testnet development. When deployi
 
 2. **Update the network configuration** to target Ethereum Mainnet (Chain ID: 1) instead of Sepolia (Chain ID: 11155111)
 
-3. **Deploy MorphStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
+3. **Deploy FlowPayStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
 
 4. **Remove the Mint button** - Real MNEE cannot be freely minted like the test token. Update the UI to hide/remove the mint functionality.
 
@@ -406,7 +406,7 @@ The project uses a `MockMNEE` ERC-20 token for testnet development. When deployi
    const MNEE_MAINNET = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF";
    
    // Skip MockMNEE deployment, use mainnet address directly
-   const morphStream = await MorphStream.deploy(MNEE_MAINNET);
+   const flowPayStream = await FlowPayStream.deploy(MNEE_MAINNET);
    ```
 
 #### Acquiring Real MNEE
@@ -418,7 +418,7 @@ On mainnet, you'll need to acquire MNEE tokens through:
 
 Check the official MNEE documentation for current acquisition methods.
 
-> **⚠️ Important:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `MorphStream.sol` — it already uses the `IERC20` interface. Always test thoroughly on Sepolia before deploying to mainnet. Mainnet transactions use real funds and cannot be reversed.
+> **⚠️ Important:** The mainnet MNEE contract is a standard ERC-20 token, so no code changes are needed in `FlowPayStream.sol` — it already uses the `IERC20` interface. Always test thoroughly on Sepolia before deploying to mainnet. Mainnet transactions use real funds and cannot be reversed.
 
 ### 4. Configure Frontend
 
@@ -554,7 +554,7 @@ console.log(response);
 ```
 flowpay/
 ├── contracts/
-│   ├── MorphStream.sol        # MNEE streaming contract
+│   ├── FlowPayStream.sol      # MNEE streaming contract
 │   └── MockMNEE.sol           # Test token for Sepolia
 ├── scripts/
 │   └── deploy.js              # Deployment script
@@ -577,7 +577,7 @@ flowpay/
 │   │   └── contactInfo.js     # Contract addresses
 │   └── netlify.toml           # Deployment config
 ├── test/
-│   └── MorphStream.test.js    # Contract tests
+│   └── FlowPayStream.test.js  # Contract tests
 ├── hardhat.config.js
 ├── package.json
 ├── LICENSE                    # MIT License
@@ -593,7 +593,7 @@ flowpay/
 ### How MNEE is Used
 
 FlowPay uses MNEE stablecoin as the payment token for all streaming payments:
-- **Payment Streams**: MNEE tokens are locked in the MorphStream smart contract and streamed per-second to recipients
+- **Payment Streams**: MNEE tokens are locked in the FlowPayStream smart contract and streamed per-second to recipients
 - **x402 Protocol**: AI agents pay for API access using MNEE via the x402 HTTP payment negotiation standard
 - **Testnet**: Uses MockMNEE (`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896`) on Sepolia
 - **Mainnet Ready**: Designed to work with real MNEE (`0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF`) on Ethereum mainnet

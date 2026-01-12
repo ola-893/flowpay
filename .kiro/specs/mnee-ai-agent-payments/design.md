@@ -35,7 +35,7 @@ By leveraging both x402's open standard and MNEE's instant settlement, FlowPay m
 graph TB
     subgraph "Ethereum Network"
         MNEE[MNEE Token Contract<br/>0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF]
-        FlowPay[FlowPay Stream Contract<br/>Modified MorphStream]
+        FlowPay[FlowPay Stream Contract<br/>FlowPayStream]
     end
     
     subgraph "x402 Layer"
@@ -238,12 +238,12 @@ async function verifyStream(streamId: string, recipient: string): Promise<boolea
 }
 ```
 
-### FlowPay Smart Contract (Modified MorphStream)
+### FlowPay Smart Contract (FlowPayStream)
 
-The core smart contract is enhanced from the existing MorphStream implementation:
+The core smart contract is the FlowPayStream implementation:
 
 ```solidity
-// Key modifications to existing MorphStream contract
+// FlowPayStream contract
 contract FlowPayStream {
     IERC20 public mneeToken; // MNEE token interface
     
@@ -276,7 +276,7 @@ contract FlowPayStream {
 }
 ```
 
-**Key Changes from MorphStream**:
+**Key Features of FlowPayStream**:
 - Replace `payable` ETH functions with MNEE token transfers
 - Add `transferFrom` for MNEE deposits
 - Include metadata field for agent identification

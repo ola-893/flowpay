@@ -1,7 +1,7 @@
 // Deployed contract addresses on Sepolia testnet
 export const contractAddress = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTRACT_ADDRESS)
   ? import.meta.env.VITE_CONTRACT_ADDRESS
-  : "0x155A00fBE3D290a8935ca4Bf5244283685Bb0035"; // MorphStream on Sepolia
+  : "0x155A00fBE3D290a8935ca4Bf5244283685Bb0035"; // FlowPayStream on Sepolia
 
 // MNEE Token address on Sepolia
 export const mneeTokenAddress = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_MNEE_TOKEN_ADDRESS)

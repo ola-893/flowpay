@@ -29,7 +29,7 @@ const sdk = new FlowPaySDK({
 |--------|------|---------|-------------|
 | `privateKey` | string | required | Wallet private key |
 | `rpcUrl` | string | required | Ethereum RPC endpoint |
-| `contractAddress` | string | required | MorphStream contract address |
+| `contractAddress` | string | required | FlowPayStream contract address |
 | `mneeAddress` | string | required | MNEE token address |
 | `agentId` | string | auto | Unique agent identifier |
 | `defaultStreamDuration` | number | 3600 | Default stream duration (seconds) |

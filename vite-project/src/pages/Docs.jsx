@@ -49,7 +49,7 @@ FlowPay implements the x402 protocol for HTTP-based payment negotiation. AI agen
 | Contract | Address |
 |----------|---------|
 | MockMNEE | \`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896\` |
-| MorphStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
+| FlowPayStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
 
 ## Features
 
@@ -247,7 +247,7 @@ npx ts-node demo/provider.ts
 
 | Contract | Address |
 |----------|---------|
-| MorphStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
+| FlowPayStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
 | MockMNEE | \`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896\` |
 `
   },
@@ -274,7 +274,7 @@ FlowPay is designed as a simple, user-friendly payment streaming platform.
 │         │                                      │            │
 │         ▼                                      ▼            │
 │  ┌──────────────┐                       ┌──────────────┐    │
-│  │   FlowPay    │                       │  MorphStream │    │
+│  │   FlowPay    │                       │  FlowPayStream │    │
 │  │  Dashboard   │                       │  + MockMNEE  │    │
 │  │   (React)    │                       │  Contracts   │    │
 │  └──────────────┘                       └──────────────┘    │
@@ -287,7 +287,7 @@ FlowPay is designed as a simple, user-friendly payment streaming platform.
 | Component | Description |
 |-----------|-------------|
 | **Dashboard** | React web app for managing streams |
-| **MorphStream** | Smart contract for payment streams |
+| **FlowPayStream** | Smart contract for payment streams |
 | **MockMNEE** | Test ERC-20 token for payments |
 | **MetaMask** | User's wallet for signing transactions |
 
@@ -457,11 +457,11 @@ flowRate = totalAmount / duration
 | Refunds | Manual | Automatic on cancel |
 `
   },
-  'morphstream-contract': {
-    title: 'MorphStream Contract',
+  'flowpaystream-contract': {
+    title: 'FlowPayStream Contract',
     icon: '📜',
     content: `
-# MorphStream Contract
+# FlowPayStream Contract
 
 The smart contract that powers FlowPay payment streams.
 
@@ -471,7 +471,7 @@ The smart contract that powers FlowPay payment streams.
 
 ## What Does It Do?
 
-MorphStream handles all the on-chain logic for payment streams:
+FlowPayStream handles all the on-chain logic for payment streams:
 
 - **Creates streams** - Locks MNEE tokens and starts the payment flow
 - **Tracks balances** - Calculates how much has been streamed in real-time
@@ -515,7 +515,7 @@ The contract emits events that the dashboard listens to:
 
 ## View on Block Explorer
 
-[View MorphStream on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x155A00fBE3D290a8935ca4Bf5244283685Bb0035)
+[View FlowPayStream on Sepolia Etherscan](https://sepolia.etherscan.io/address/0x155A00fBE3D290a8935ca4Bf5244283685Bb0035)
 `
   },
   'mnee-token': {
@@ -600,7 +600,7 @@ export const mneeTokenAddress = '0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF';
 
 2. **Update the network configuration** to target Ethereum Mainnet (Chain ID: 1) instead of Sepolia (Chain ID: 11155111)
 
-3. **Deploy MorphStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
+3. **Deploy FlowPayStream to mainnet** - The streaming contract needs to be deployed to mainnet and its address updated
 
 4. **Remove the Mint button** - Real MNEE cannot be freely minted like the test token
 
@@ -684,7 +684,7 @@ Manually create a payment stream.
 
 \`\`\`typescript
 const stream = await sdk.createStream(
-    '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035',  // MorphStream
+    '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035',  // FlowPayStream
     '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896',  // MockMNEE
     ethers.parseEther("10"),  // 10 MNEE
     3600,  // 1 hour
@@ -758,7 +758,7 @@ const status = sdk.monitor.getStatus();
 |--------|-------------|
 | \`X-Payment-Required\` | Indicates payment needed |
 | \`X-FlowPay-Rate\` | MNEE per second/request |
-| \`X-FlowPay-Contract\` | MorphStream contract address |
+| \`X-FlowPay-Contract\` | FlowPayStream contract address |
 | \`X-MNEE-Address\` | MNEE token address |
 
 ## Demo Scripts
@@ -787,7 +787,7 @@ Deploy FlowPay to Ethereum networks.
 | Contract | Address |
 |----------|---------|
 | MockMNEE | \`0x96B1FE54Ee89811f46ecE4a347950E0D682D3896\` |
-| MorphStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
+| FlowPayStream | \`0x155A00fBE3D290a8935ca4Bf5244283685Bb0035\` |
 
 ## Deploy Your Own
 
@@ -942,7 +942,7 @@ const sidebarNav = [
   {
     title: 'Smart Contracts',
     items: [
-      { id: 'morphstream-contract', title: 'MorphStream' },
+      { id: 'flowpaystream-contract', title: 'FlowPayStream' },
       { id: 'mnee-token', title: 'MockMNEE Token' },
     ]
   },

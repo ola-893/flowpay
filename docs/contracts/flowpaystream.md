@@ -1,6 +1,6 @@
-# MorphStream Contract
+# FlowPayStream Contract
 
-The MorphStream contract is the core payment streaming infrastructure.
+The FlowPayStream contract is the core payment streaming infrastructure.
 
 ## Contract Address
 
@@ -8,7 +8,7 @@ The MorphStream contract is the core payment streaming infrastructure.
 
 ## Overview
 
-MorphStream enables continuous payment streams using MNEE tokens. Funds flow from sender to recipient over time, calculated per-second.
+FlowPayStream enables continuous payment streams using MNEE tokens. Funds flow from sender to recipient over time, calculated per-second.
 
 ## Functions
 
@@ -42,10 +42,10 @@ function createStream(
 **Example:**
 ```javascript
 // Approve tokens first
-await mnee.approve(morphStreamAddress, amount);
+await mnee.approve(flowPayStreamAddress, amount);
 
 // Create stream
-await morphStream.createStream(
+await flowPayStream.createStream(
   recipientAddress,
   3600, // 1 hour
   ethers.parseEther('10'), // 10 MNEE
@@ -73,7 +73,7 @@ function withdrawFromStream(uint256 streamId) external
 
 **Example:**
 ```javascript
-await morphStream.withdrawFromStream(42);
+await flowPayStream.withdrawFromStream(42);
 ```
 
 ### cancelStream

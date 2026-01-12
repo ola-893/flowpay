@@ -19,7 +19,7 @@
 ## Smart Contracts
 
 * [Overview](contracts/README.md)
-* [MorphStream](contracts/morphstream.md)
+* [FlowPayStream](contracts/flowpaystream.md)
 * [MockMNEE Token](contracts/mock-mnee.md)
 * [Events & Errors](contracts/events-errors.md)
 

@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-const MORPHSTREAM_ADDRESS = '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035';
+const FLOWPAYSTREAM_ADDRESS = '0x155A00fBE3D290a8935ca4Bf5244283685Bb0035';
 const MOCK_MNEE_ADDRESS = '0x96B1FE54Ee89811f46ecE4a347950E0D682D3896';
 // Use a more reliable RPC endpoint
 const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com';
@@ -79,13 +79,13 @@ async function checkSetup() {
 
     // 6. Check contracts exist
     console.log("\n5️⃣  Contracts:");
-    const morphStreamCode = await provider.getCode(MORPHSTREAM_ADDRESS);
+    const flowPayStreamCode = await provider.getCode(FLOWPAYSTREAM_ADDRESS);
     const mneeCode = await provider.getCode(MOCK_MNEE_ADDRESS);
 
-    if (morphStreamCode !== '0x') {
-        console.log(`   ✅ MorphStream: ${MORPHSTREAM_ADDRESS}`);
+    if (flowPayStreamCode !== '0x') {
+        console.log(`   ✅ FlowPayStream: ${FLOWPAYSTREAM_ADDRESS}`);
     } else {
-        console.log(`   ❌ MorphStream not deployed at ${MORPHSTREAM_ADDRESS}`);
+        console.log(`   ❌ FlowPayStream not deployed at ${FLOWPAYSTREAM_ADDRESS}`);
     }
 
     if (mneeCode !== '0x') {

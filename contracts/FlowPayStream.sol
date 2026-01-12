@@ -14,10 +14,10 @@ interface IERC20 {
 }
 
 /**
-* @title MorphStream
-* @dev A protocol for creating real-time, per-second money streams on Morph using MNEE tokens.
+* @title FlowPayStream
+* @dev A protocol for creating real-time, per-second money streams on Sepolia using MNEE tokens.
 */
-contract MorphStream {
+contract FlowPayStream {
     IERC20 public mneeToken;
 
     // Structure to hold all data for a single stream
@@ -43,7 +43,7 @@ contract MorphStream {
     event StreamCancelled(uint256 indexed streamId, address sender, address recipient, uint256 senderBalance, uint256 recipientBalance);
 
     constructor(address _mneeToken) {
-        require(_mneeToken != address(0), "MorphStream: MNEE token address cannot be zero");
+        require(_mneeToken != address(0), "FlowPayStream: MNEE token address cannot be zero");
         mneeToken = IERC20(_mneeToken);
     }
 
@@ -54,7 +54,7 @@ contract MorphStream {
     */
     function getClaimableBalance(uint256 streamId) public view returns (uint256) {
         Stream storage stream = streams[streamId];
-        require(stream.isActive, "MorphStream: Stream is not active.");
+        require(stream.isActive, "FlowPayStream: Stream is not active.");
 
         // If the current time is before the start time, nothing has been streamed.
         if (block.timestamp < stream.startTime) {
@@ -79,20 +79,20 @@ contract MorphStream {
     * @param metadata JSON string containing agent identification and other info.
     */
     function createStream(address recipient, uint256 duration, uint256 amount, string calldata metadata) external {
-        require(amount > 0, "MorphStream: Total amount must be greater than 0.");
-        require(recipient != address(0), "MorphStream: Recipient cannot be the zero address.");
-        require(duration > 0, "MorphStream: Duration must be greater than 0.");
+        require(amount > 0, "FlowPayStream: Total amount must be greater than 0.");
+        require(recipient != address(0), "FlowPayStream: Recipient cannot be the zero address.");
+        require(duration > 0, "FlowPayStream: Duration must be greater than 0.");
 
         // Transfer MNEE tokens from sender to this contract
         bool success = mneeToken.transferFrom(msg.sender, address(this), amount);
-        require(success, "MorphStream: Transfer failed. check allowance");
+        require(success, "FlowPayStream: Transfer failed. check allowance");
 
         uint256 streamId = nextStreamId++;
         uint256 startTime = block.timestamp;
         uint256 stopTime = startTime + duration;
         // Floor division to avoid rounding up. Require non-zero rate to prevent zero-per-second streams.
         uint256 flowRate = amount / duration;
-        require(flowRate > 0, "MorphStream: flowRate would be zero. Increase amount or duration.");
+        require(flowRate > 0, "FlowPayStream: flowRate would be zero. Increase amount or duration.");
 
         streams[streamId] = Stream({
             sender: msg.sender,
@@ -115,16 +115,16 @@ contract MorphStream {
     */
     function withdrawFromStream(uint256 streamId) external {
         Stream storage stream = streams[streamId];
-        require(stream.isActive, "MorphStream: Stream is not active.");
-        require(msg.sender == stream.recipient, "MorphStream: Caller is not the recipient.");
+        require(stream.isActive, "FlowPayStream: Stream is not active.");
+        require(msg.sender == stream.recipient, "FlowPayStream: Caller is not the recipient.");
 
         uint256 claimableAmount = getClaimableBalance(streamId);
-        require(claimableAmount > 0, "MorphStream: No funds to withdraw.");
+        require(claimableAmount > 0, "FlowPayStream: No funds to withdraw.");
 
         stream.amountWithdrawn += claimableAmount;
         
         bool success = mneeToken.transfer(stream.recipient, claimableAmount);
-        require(success, "MorphStream: Transfer failed.");
+        require(success, "FlowPayStream: Transfer failed.");
 
         emit Withdrawn(streamId, stream.recipient, claimableAmount);
     }
@@ -135,8 +135,8 @@ contract MorphStream {
     */
     function cancelStream(uint256 streamId) external {
         Stream storage stream = streams[streamId];
-        require(stream.isActive, "MorphStream: Stream already cancelled.");
-        require(msg.sender == stream.sender || msg.sender == stream.recipient, "MorphStream: Caller cannot cancel this stream.");
+        require(stream.isActive, "FlowPayStream: Stream already cancelled.");
+        require(msg.sender == stream.sender || msg.sender == stream.recipient, "FlowPayStream: Caller cannot cancel this stream.");
 
         uint256 recipientBalance = getClaimableBalance(streamId);
         uint256 senderBalance = (stream.totalAmount - stream.amountWithdrawn) - recipientBalance;
@@ -145,12 +145,12 @@ contract MorphStream {
 
         if (recipientBalance > 0) {
             bool success = mneeToken.transfer(stream.recipient, recipientBalance);
-            require(success, "MorphStream: Recipient transfer failed on cancel.");
+            require(success, "FlowPayStream: Recipient transfer failed on cancel.");
         }
 
         if (senderBalance > 0) {
             bool success = mneeToken.transfer(stream.sender, senderBalance);
-            require(success, "MorphStream: Sender refund failed on cancel.");
+            require(success, "FlowPayStream: Sender refund failed on cancel.");
         }
 
         emit StreamCancelled(streamId, stream.sender, stream.recipient, senderBalance, recipientBalance);

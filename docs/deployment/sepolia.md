@@ -7,7 +7,7 @@ Guide for deploying FlowPay to Ethereum Sepolia testnet.
 | Contract | Address |
 |----------|---------|
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
-| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 
 **Network:** Ethereum Sepolia (Chain ID: 11155111)
 
@@ -59,8 +59,8 @@ npx hardhat run scripts/deploy.js --network sepolia
 Deploying contracts with the account: 0x...
 Deploying MockMNEE...
 MockMNEE deployed to: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
-Deploying MorphStream with MNEE address: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
-MorphStream deployed to: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
+Deploying FlowPayStream with MNEE address: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
+FlowPayStream deployed to: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
 ```
 
 ### 5. Verify Contracts (Optional)
@@ -69,7 +69,7 @@ MorphStream deployed to: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
 # Verify MockMNEE
 npx hardhat verify --network sepolia 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
 
-# Verify MorphStream
+# Verify FlowPayStream
 npx hardhat verify --network sepolia 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035 "0x96B1FE54Ee89811f46ecE4a347950E0D682D3896"
 ```
 

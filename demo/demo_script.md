@@ -34,7 +34,7 @@ npx ts-node demo/provider.ts
 **Expected Output**:
 ```
 🔧 Provider Configuration:
-   MorphStream Contract: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
+   FlowPayStream Contract: 0x155A00fBE3D290a8935ca4Bf5244283685Bb0035
    MNEE Token: 0x96B1FE54Ee89811f46ecE4a347950E0D682D3896
    RPC URL: https://rpc.sepolia.org
 
@@ -142,7 +142,7 @@ All transactions are real and verifiable on Sepolia:
 
 | Contract | Address |
 |----------|---------|
-| MorphStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
+| FlowPayStream | `0x155A00fBE3D290a8935ca4Bf5244283685Bb0035` |
 | MockMNEE | `0x96B1FE54Ee89811f46ecE4a347950E0D682D3896` |
 
 ---
